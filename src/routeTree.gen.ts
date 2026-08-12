@@ -22,6 +22,7 @@ import { Route as QuizzesRouteImport } from './routes/quizzes'
 import { Route as SubjectsRouteImport } from './routes/subjects'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SupportIndexRouteImport } from './routes/support.index'
+import { Route as SupportChatRouteImport } from './routes/support.chat'
 import { Route as SupportNewRouteImport } from './routes/support.new'
 import { Route as SupportTicketsIndexRouteImport } from './routes/support.tickets.index'
 import { Route as SupportTicketsTicketIdRouteImport } from './routes/support.tickets.$ticketId'
@@ -91,6 +92,11 @@ const SupportIndexRoute = SupportIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SupportRoute,
 } as any)
+const SupportChatRoute = SupportChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => SupportRoute,
+} as any)
 const SupportNewRoute = SupportNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
   '/support': typeof SupportRouteWithChildren
+  '/support/chat': typeof SupportChatRoute
   '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
   '/support/tickets/$ticketId': typeof SupportTicketsTicketIdRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
+  '/support/chat': typeof SupportChatRoute
   '/support/new': typeof SupportNewRoute
   '/support': typeof SupportIndexRoute
   '/support/tickets/$ticketId': typeof SupportTicketsTicketIdRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
   '/support': typeof SupportRouteWithChildren
+  '/support/chat': typeof SupportChatRoute
   '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
   '/support/tickets/$ticketId': typeof SupportTicketsTicketIdRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/quizzes'
     | '/subjects'
     | '/support'
+    | '/support/chat'
     | '/support/new'
     | '/support/'
     | '/support/tickets/$ticketId'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/quizzes'
     | '/subjects'
+    | '/support/chat'
     | '/support/new'
     | '/support'
     | '/support/tickets/$ticketId'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/quizzes'
     | '/subjects'
     | '/support'
+    | '/support/chat'
     | '/support/new'
     | '/support/'
     | '/support/tickets/$ticketId'
@@ -325,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportIndexRouteImport
       parentRoute: typeof SupportRoute
     }
+    '/support/chat': {
+      id: '/support/chat'
+      path: '/chat'
+      fullPath: '/support/chat'
+      preLoaderRoute: typeof SupportChatRouteImport
+      parentRoute: typeof SupportRoute
+    }
     '/support/new': {
       id: '/support/new'
       path: '/new'
@@ -350,6 +369,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface SupportRouteChildren {
+  SupportChatRoute: typeof SupportChatRoute
   SupportNewRoute: typeof SupportNewRoute
   SupportIndexRoute: typeof SupportIndexRoute
   SupportTicketsTicketIdRoute: typeof SupportTicketsTicketIdRoute
@@ -357,6 +377,7 @@ interface SupportRouteChildren {
 }
 
 const SupportRouteChildren: SupportRouteChildren = {
+  SupportChatRoute: SupportChatRoute,
   SupportNewRoute: SupportNewRoute,
   SupportIndexRoute: SupportIndexRoute,
   SupportTicketsTicketIdRoute: SupportTicketsTicketIdRoute,

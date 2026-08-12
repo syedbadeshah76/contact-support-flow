@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopBar } from "@/components/TopBar";
+import { Toaster } from "@/components/ui/sonner";
 
 
 function NotFoundComponent() {
@@ -97,8 +98,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Dashboard — Kidzy Learning Portal" },
       { name: "twitter:description", content: "Your learning dashboard: streaks, XP, daily challenges and courses picked for teens." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/43f26287-b35c-4888-8392-9e1957d4f21e/id-preview-88dacaa0--bfc0d50a-5c77-48bc-80ff-587178d20638.lovable.app-1785660181221.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/43f26287-b35c-4888-8392-9e1957d4f21e/id-preview-88dacaa0--bfc0d50a-5c77-48bc-80ff-587178d20638.lovable.app-1785660181221.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -147,6 +146,7 @@ function RootComponent() {
             </main>
           </div>
         </div>
+        <Toaster />
       </SidebarProvider>
     </QueryClientProvider>
   );

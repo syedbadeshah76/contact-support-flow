@@ -11,6 +11,9 @@ import {
   Medal,
   ScrollText,
   UserRound,
+  LifeBuoy,
+  Ticket,
+  MessagesSquare,
 } from "lucide-react";
 
 import {
@@ -41,6 +44,12 @@ const playItems = [
   { title: "Leaderboard", url: "/leaderboard", icon: Medal },
   { title: "Certificates", url: "/certificates", icon: ScrollText },
   { title: "Profile", url: "/profile", icon: UserRound },
+];
+
+const helpItems = [
+  { title: "Help Centre", url: "/support", icon: LifeBuoy },
+  { title: "My Requests", url: "/support/tickets", icon: Ticket },
+  { title: "Live Chat", url: "/support/chat", icon: MessagesSquare },
 ];
 
 export function AppSidebar() {
@@ -93,6 +102,28 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {playItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.url)}
+                    tooltip={item.title}
+                    className="rounded-xl"
+                  >
+                    <Link to={item.url} className="flex items-center gap-3">
+                      <item.icon className="size-4.5" />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel>Help</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {helpItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
