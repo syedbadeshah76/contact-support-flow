@@ -204,3 +204,6 @@ export const statusFilters: (TicketStatus | "All")[] = [
   "Waiting on you",
   "Resolved",
 ];
+
+export type Ticket = (typeof tickets)[number];
+export type TicketMessage = Ticket["messages"][number];

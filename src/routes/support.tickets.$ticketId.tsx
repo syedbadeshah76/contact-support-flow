@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/StatusPill";
 import { Textarea } from "@/components/ui/textarea";
-import { tickets } from "@/data/support";
+import { tickets, type TicketMessage } from "@/data/support";
 
 export const Route = createFileRoute("/support/tickets/$ticketId")({
   loader: ({ params }) => {
@@ -75,7 +75,7 @@ function TicketThread() {
         <section className="card-surface space-y-4 p-5 sm:p-6">
           <h2 className="text-lg font-bold">Conversation</h2>
           <ul className="space-y-4">
-            {ticket.messages.map((m, i) => (
+            {ticket.messages.map((m: TicketMessage, i: number) => (
               <li
                 key={i}
                 className={`flex gap-3 ${m.from === "you" ? "flex-row-reverse" : ""}`}

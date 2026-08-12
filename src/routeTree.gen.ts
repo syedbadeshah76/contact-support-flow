@@ -24,6 +24,7 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SupportIndexRouteImport } from './routes/support.index'
 import { Route as SupportNewRouteImport } from './routes/support.new'
 import { Route as SupportTicketsIndexRouteImport } from './routes/support.tickets.index'
+import { Route as SupportTicketsTicketIdRouteImport } from './routes/support.tickets.$ticketId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -100,6 +101,11 @@ const SupportTicketsIndexRoute = SupportTicketsIndexRouteImport.update({
   path: '/tickets/',
   getParentRoute: () => SupportRoute,
 } as any)
+const SupportTicketsTicketIdRoute = SupportTicketsTicketIdRouteImport.update({
+  id: '/tickets/$ticketId',
+  path: '/tickets/$ticketId',
+  getParentRoute: () => SupportRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRouteWithChildren
   '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
+  '/support/tickets/$ticketId': typeof SupportTicketsTicketIdRoute
   '/support/tickets/': typeof SupportTicketsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/subjects': typeof SubjectsRoute
   '/support/new': typeof SupportNewRoute
   '/support': typeof SupportIndexRoute
+  '/support/tickets/$ticketId': typeof SupportTicketsTicketIdRoute
   '/support/tickets': typeof SupportTicketsIndexRoute
 }
 export interface FileRoutesById {
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/support': typeof SupportRouteWithChildren
   '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
+  '/support/tickets/$ticketId': typeof SupportTicketsTicketIdRoute
   '/support/tickets/': typeof SupportTicketsIndexRoute
 }
 export interface FileRouteTypes {
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/support/new'
     | '/support/'
+    | '/support/tickets/$ticketId'
     | '/support/tickets/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/subjects'
     | '/support/new'
     | '/support'
+    | '/support/tickets/$ticketId'
     | '/support/tickets'
   id:
     | '__root__'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/support/new'
     | '/support/'
+    | '/support/tickets/$ticketId'
     | '/support/tickets/'
   fileRoutesById: FileRoutesById
 }
@@ -327,18 +339,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportTicketsIndexRouteImport
       parentRoute: typeof SupportRoute
     }
+    '/support/tickets/$ticketId': {
+      id: '/support/tickets/$ticketId'
+      path: '/tickets/$ticketId'
+      fullPath: '/support/tickets/$ticketId'
+      preLoaderRoute: typeof SupportTicketsTicketIdRouteImport
+      parentRoute: typeof SupportRoute
+    }
   }
 }
 
 interface SupportRouteChildren {
   SupportNewRoute: typeof SupportNewRoute
   SupportIndexRoute: typeof SupportIndexRoute
+  SupportTicketsTicketIdRoute: typeof SupportTicketsTicketIdRoute
   SupportTicketsIndexRoute: typeof SupportTicketsIndexRoute
 }
 
 const SupportRouteChildren: SupportRouteChildren = {
   SupportNewRoute: SupportNewRoute,
   SupportIndexRoute: SupportIndexRoute,
+  SupportTicketsTicketIdRoute: SupportTicketsTicketIdRoute,
   SupportTicketsIndexRoute: SupportTicketsIndexRoute,
 }
 
