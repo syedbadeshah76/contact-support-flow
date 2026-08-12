@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AchievementsRouteImport } from './routes/achievements'
+import { Route as CertificatesRouteImport } from './routes/certificates'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as LearningPathRouteImport } from './routes/learning-path'
+import { Route as LiveClassesRouteImport } from './routes/live-classes'
+import { Route as MyLearningRouteImport } from './routes/my-learning'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as QuizzesRouteImport } from './routes/quizzes'
+import { Route as SubjectsRouteImport } from './routes/subjects'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AchievementsRoute = AchievementsRouteImport.update({
+  id: '/achievements',
+  path: '/achievements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaderboardRoute = LeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearningPathRoute = LearningPathRouteImport.update({
+  id: '/learning-path',
+  path: '/learning-path',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveClassesRoute = LiveClassesRouteImport.update({
+  id: '/live-classes',
+  path: '/live-classes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyLearningRoute = MyLearningRouteImport.update({
+  id: '/my-learning',
+  path: '/my-learning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuizzesRoute = QuizzesRouteImport.update({
+  id: '/quizzes',
+  path: '/quizzes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SubjectsRoute = SubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/certificates': typeof CertificatesRoute
+  '/explore': typeof ExploreRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/learning-path': typeof LearningPathRoute
+  '/live-classes': typeof LiveClassesRoute
+  '/my-learning': typeof MyLearningRoute
+  '/profile': typeof ProfileRoute
+  '/quizzes': typeof QuizzesRoute
+  '/subjects': typeof SubjectsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/certificates': typeof CertificatesRoute
+  '/explore': typeof ExploreRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/learning-path': typeof LearningPathRoute
+  '/live-classes': typeof LiveClassesRoute
+  '/my-learning': typeof MyLearningRoute
+  '/profile': typeof ProfileRoute
+  '/quizzes': typeof QuizzesRoute
+  '/subjects': typeof SubjectsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/achievements': typeof AchievementsRoute
+  '/certificates': typeof CertificatesRoute
+  '/explore': typeof ExploreRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/learning-path': typeof LearningPathRoute
+  '/live-classes': typeof LiveClassesRoute
+  '/my-learning': typeof MyLearningRoute
+  '/profile': typeof ProfileRoute
+  '/quizzes': typeof QuizzesRoute
+  '/subjects': typeof SubjectsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/achievements'
+    | '/certificates'
+    | '/explore'
+    | '/leaderboard'
+    | '/learning-path'
+    | '/live-classes'
+    | '/my-learning'
+    | '/profile'
+    | '/quizzes'
+    | '/subjects'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/achievements'
+    | '/certificates'
+    | '/explore'
+    | '/leaderboard'
+    | '/learning-path'
+    | '/live-classes'
+    | '/my-learning'
+    | '/profile'
+    | '/quizzes'
+    | '/subjects'
+  id:
+    | '__root__'
+    | '/'
+    | '/achievements'
+    | '/certificates'
+    | '/explore'
+    | '/leaderboard'
+    | '/learning-path'
+    | '/live-classes'
+    | '/my-learning'
+    | '/profile'
+    | '/quizzes'
+    | '/subjects'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AchievementsRoute: typeof AchievementsRoute
+  CertificatesRoute: typeof CertificatesRoute
+  ExploreRoute: typeof ExploreRoute
+  LeaderboardRoute: typeof LeaderboardRoute
+  LearningPathRoute: typeof LearningPathRoute
+  LiveClassesRoute: typeof LiveClassesRoute
+  MyLearningRoute: typeof MyLearningRoute
+  ProfileRoute: typeof ProfileRoute
+  QuizzesRoute: typeof QuizzesRoute
+  SubjectsRoute: typeof SubjectsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +182,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/achievements': {
+      id: '/achievements'
+      path: '/achievements'
+      fullPath: '/achievements'
+      preLoaderRoute: typeof AchievementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learning-path': {
+      id: '/learning-path'
+      path: '/learning-path'
+      fullPath: '/learning-path'
+      preLoaderRoute: typeof LearningPathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live-classes': {
+      id: '/live-classes'
+      path: '/live-classes'
+      fullPath: '/live-classes'
+      preLoaderRoute: typeof LiveClassesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-learning': {
+      id: '/my-learning'
+      path: '/my-learning'
+      fullPath: '/my-learning'
+      preLoaderRoute: typeof MyLearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quizzes': {
+      id: '/quizzes'
+      path: '/quizzes'
+      fullPath: '/quizzes'
+      preLoaderRoute: typeof QuizzesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/subjects': {
+      id: '/subjects'
+      path: '/subjects'
+      fullPath: '/subjects'
+      preLoaderRoute: typeof SubjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AchievementsRoute: AchievementsRoute,
+  CertificatesRoute: CertificatesRoute,
+  ExploreRoute: ExploreRoute,
+  LeaderboardRoute: LeaderboardRoute,
+  LearningPathRoute: LearningPathRoute,
+  LiveClassesRoute: LiveClassesRoute,
+  MyLearningRoute: MyLearningRoute,
+  ProfileRoute: ProfileRoute,
+  QuizzesRoute: QuizzesRoute,
+  SubjectsRoute: SubjectsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
