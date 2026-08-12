@@ -22,6 +22,7 @@ import { Route as QuizzesRouteImport } from './routes/quizzes'
 import { Route as SubjectsRouteImport } from './routes/subjects'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as SupportIndexRouteImport } from './routes/support.index'
+import { Route as SupportNewRouteImport } from './routes/support.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +89,11 @@ const SupportIndexRoute = SupportIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SupportRoute,
 } as any)
+const SupportNewRoute = SupportNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => SupportRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
   '/support': typeof SupportRouteWithChildren
+  '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
 }
 export interface FileRoutesByTo {
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
+  '/support/new': typeof SupportNewRoute
   '/support': typeof SupportIndexRoute
 }
 export interface FileRoutesById {
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
   '/support': typeof SupportRouteWithChildren
+  '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
 }
 export interface FileRouteTypes {
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/quizzes'
     | '/subjects'
     | '/support'
+    | '/support/new'
     | '/support/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/quizzes'
     | '/subjects'
+    | '/support/new'
     | '/support'
   id:
     | '__root__'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/quizzes'
     | '/subjects'
     | '/support'
+    | '/support/new'
     | '/support/'
   fileRoutesById: FileRoutesById
 }
@@ -289,14 +301,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportIndexRouteImport
       parentRoute: typeof SupportRoute
     }
+    '/support/new': {
+      id: '/support/new'
+      path: '/new'
+      fullPath: '/support/new'
+      preLoaderRoute: typeof SupportNewRouteImport
+      parentRoute: typeof SupportRoute
+    }
   }
 }
 
 interface SupportRouteChildren {
+  SupportNewRoute: typeof SupportNewRoute
   SupportIndexRoute: typeof SupportIndexRoute
 }
 
 const SupportRouteChildren: SupportRouteChildren = {
+  SupportNewRoute: SupportNewRoute,
   SupportIndexRoute: SupportIndexRoute,
 }
 
