@@ -11,6 +11,10 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
+import { TopBar } from "@/components/TopBar";
+
 
 function NotFoundComponent() {
   return (
@@ -77,19 +81,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Dashboard — Kidzy Learning Portal" },
+      {
+        name: "description",
+        content:
+          "Your learning dashboard: streaks, XP, daily challenges and courses picked for teens.",
+      },
+      { property: "og:title", content: "Dashboard — Kidzy Learning Portal" },
+      {
+        property: "og:description",
+        content:
+          "Your learning dashboard: streaks, XP, daily challenges and courses picked for teens.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Dashboard — Kidzy Learning Portal" },
+      { name: "twitter:description", content: "Your learning dashboard: streaks, XP, daily challenges and courses picked for teens." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/43f26287-b35c-4888-8392-9e1957d4f21e/id-preview-88dacaa0--bfc0d50a-5c77-48bc-80ff-587178d20638.lovable.app-1785660181221.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/43f26287-b35c-4888-8392-9e1957d4f21e/id-preview-88dacaa0--bfc0d50a-5c77-48bc-80ff-587178d20638.lovable.app-1785660181221.png" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Figtree:wght@400;500;600;700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
@@ -119,8 +136,19 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full bg-background">
+          <AppSidebar />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <TopBar />
+            <main className="flex-1 px-4 py-6 sm:px-8">
+              {/* Required: nested routes render here. */}
+              <Outlet />
+            </main>
+          </div>
+        </div>
+      </SidebarProvider>
     </QueryClientProvider>
   );
 }
+
