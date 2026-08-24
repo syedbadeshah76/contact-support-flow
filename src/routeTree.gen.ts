@@ -21,6 +21,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as QuizzesRouteImport } from './routes/quizzes'
 import { Route as SubjectsRouteImport } from './routes/subjects'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as CoursesCourseIdRouteImport } from './routes/courses.$courseId'
 import { Route as SupportIndexRouteImport } from './routes/support.index'
 import { Route as SupportChatRouteImport } from './routes/support.chat'
 import { Route as SupportNewRouteImport } from './routes/support.new'
@@ -87,6 +88,11 @@ const SupportRoute = SupportRouteImport.update({
   path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
+  id: '/courses/$courseId',
+  path: '/courses/$courseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportIndexRoute = SupportIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
   '/support': typeof SupportRouteWithChildren
+  '/courses/$courseId': typeof CoursesCourseIdRoute
   '/support/chat': typeof SupportChatRoute
   '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
   '/support/chat': typeof SupportChatRoute
   '/support/new': typeof SupportNewRoute
   '/support': typeof SupportIndexRoute
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/quizzes': typeof QuizzesRoute
   '/subjects': typeof SubjectsRoute
   '/support': typeof SupportRouteWithChildren
+  '/courses/$courseId': typeof CoursesCourseIdRoute
   '/support/chat': typeof SupportChatRoute
   '/support/new': typeof SupportNewRoute
   '/support/': typeof SupportIndexRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/quizzes'
     | '/subjects'
     | '/support'
+    | '/courses/$courseId'
     | '/support/chat'
     | '/support/new'
     | '/support/'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/quizzes'
     | '/subjects'
+    | '/courses/$courseId'
     | '/support/chat'
     | '/support/new'
     | '/support'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/quizzes'
     | '/subjects'
     | '/support'
+    | '/courses/$courseId'
     | '/support/chat'
     | '/support/new'
     | '/support/'
@@ -242,6 +254,7 @@ export interface RootRouteChildren {
   QuizzesRoute: typeof QuizzesRoute
   SubjectsRoute: typeof SubjectsRoute
   SupportRoute: typeof SupportRouteWithChildren
+  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -330,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courses/$courseId': {
+      id: '/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof CoursesCourseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/support/': {
       id: '/support/'
       path: '/'
@@ -400,7 +420,18 @@ const rootRouteChildren: RootRouteChildren = {
   QuizzesRoute: QuizzesRoute,
   SubjectsRoute: SubjectsRoute,
   SupportRoute: SupportRouteWithChildren,
+  CoursesCourseIdRoute: CoursesCourseIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
