@@ -14,7 +14,7 @@ import {
   Settings,
 } from "lucide-react";
 
-import { EdvanzLogo } from "@/components/EdvanzLogo";
+import edvanzLogo from "@/assets/edvanz-logo.png";
 import pandaAvatar from "@/assets/panda-avatar.jpg";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,7 +41,7 @@ const navItems = [
   { title: "Leaderboard", url: "/leaderboard", icon: Medal },
   { title: "Certificates", url: "/certificates", icon: ScrollText },
   { title: "Profile", url: "/profile", icon: UserRound },
-  { title: "Settings", url: "/profile", icon: Settings },
+  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -53,9 +53,25 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-slate-100 bg-white">
-      <SidebarHeader className="px-6 pt-6 pb-4">
+      <SidebarHeader className="px-5 pt-5 pb-2">
         <Link to="/" className="flex items-center">
-          <EdvanzLogo collapsed={collapsed} />
+          {collapsed ? (
+            <div className="relative flex size-9 items-center justify-center overflow-hidden rounded-xl">
+              <img
+                src={edvanzLogo}
+                alt="Edvanz"
+                className="h-16 w-auto max-w-none object-contain scale-[2.8] -translate-x-5"
+              />
+            </div>
+          ) : (
+            <div className="relative flex h-14 w-44 items-center justify-center overflow-hidden">
+              <img
+                src={edvanzLogo}
+                alt="Edvanz - Beyond Learning"
+                className="h-[55px] w-auto max-w-none object-contain scale-[2.5] -translate-y-0.5"
+              />
+            </div>
+          )}
         </Link>
       </SidebarHeader>
 

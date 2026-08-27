@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 
-import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,228 +12,183 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
-import { badges, certificates, learner, stats, subjects } from "@/data/portal";
 import { useAppState } from "@/lib/app-state";
 import { useDocumentMeta } from "@/lib/meta";
 
-const profileSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, { message: "Name needs at least 2 characters" })
-    .max(40, { message: "Keep the name under 40 characters" }),
-  avatar: z.string().trim().min(1, { message: "Pick an emoji" }).max(4),
-  bio: z.string().trim().max(160, { message: "Bio must be under 160 characters" }),
-});
+const profileStats = [
+  { value: "9", label: "Courses enrolled" },
+  { value: "80", label: "Lessons done" },
+  { value: "17d", label: "Weekly streak" },
+  { value: "62h", label: "Learning hours" },
+];
 
-const avatarChoices = ["🦊", "🐼", "🦄", "🐯", "🐧", "🦁", "🐨", "🐸"];
+const interestsList = [
+  { name: "Math", icon: "➗" },
+  { name: "Science", icon: "🧪" },
+  { name: "English", icon: "📖" },
+  { name: "Coding", icon: "💻" },
+  { name: "Music", icon: "🎵" },
+];
+
+const recentBadges = [
+  { name: "Start Streak", icon: "🔥" },
+  { name: "Story Star", icon: "⭐" },
+  { name: "Code Ninja", icon: "🥷" },
+];
+
+const certificatesList = [
+  { title: "Scratch Game Designer", date: "Mar 2026" },
+  { title: "Intro to Web Design", date: "Jan 2026" },
+  { title: "Creative Writing Level 1", date: "Dec 2025" },
+];
 
 export function ProfilePage() {
   useDocumentMeta(
-    "Profile - Kidzy",
-    "Your Kidzy profile: level, XP, interests, badges and certificates.",
+    "Profile - EDVANZ",
+    "Your EDVANZ profile: level, XP, interests, badges and certificates.",
   );
 
-  const { profile, saveProfile, interests, toggleInterest, favourites } = useAppState();
+  const { profile, saveProfile } = useAppState();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState(profile);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState(false);
+  const [nameInput, setNameInput] = useState(profile.name);
 
-  useEffect(() => setForm(profile), [profile]);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const parsed = profileSchema.safeParse(form);
-    if (!parsed.success) {
-      const next: Record<string, string> = {};
-      for (const issue of parsed.error.issues) next[String(issue.path[0])] = issue.message;
-      setErrors(next);
-      toast.error("Please fix the highlighted fields");
-      return;
-    }
-
-    setErrors({});
-    setSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    saveProfile(parsed.data);
-    setSaving(false);
+  const handleSave = () => {
+    saveProfile({ ...profile, name: nameInput });
     setOpen(false);
-    toast.success("Profile updated");
+    toast.success("Profile updated!");
   };
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-7">
-      <PageHeader eyebrow="You" title="Profile" />
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-12">
+      {/* Header */}
+      <div>
+        <p className="text-xs font-black uppercase tracking-wider text-blue-600">YOU</p>
+        <h1 className="mt-1 text-3xl font-black text-slate-900 sm:text-4xl">Profile</h1>
+      </div>
 
-      <section className="card-surface flex flex-wrap items-center gap-6 bg-soft-gradient p-6">
-        <span className="grid size-24 place-items-center rounded-3xl bg-card text-5xl shadow-card">
-          {profile.avatar}
-        </span>
-        <div className="min-w-52 flex-1">
-          <h2 className="text-2xl font-extrabold">{profile.name}</h2>
-          <p className="text-sm text-muted-foreground">
-            Level {learner.level} · {learner.streak}-day streak · {learner.coins} coins
-          </p>
-          {profile.bio && <p className="mt-1 text-sm">{profile.bio}</p>}
-          <Progress value={Math.round((learner.xp / learner.xpToNext) * 100)} className="mt-3 h-2" />
-          <p className="mt-1 text-xs font-semibold text-muted-foreground">
-            {learner.xp} / {learner.xpToNext} XP to Level {learner.level + 1}
-          </p>
+      {/* Hero Banner Card */}
+      <section className="relative flex flex-wrap items-center justify-between gap-6 rounded-3xl border border-[#ddd6fe] bg-gradient-to-r from-[#c7d2fe]/90 via-[#ede9fe] to-[#e0e7ff] p-6 shadow-sm sm:p-8">
+        <div className="flex items-center gap-5">
+          <div className="flex size-20 shrink-0 items-center justify-center rounded-full bg-orange-100 text-4xl shadow-md border-2 border-white">
+            {profile.avatar}
+          </div>
+          <div>
+            <h2 className="text-2xl font-black text-slate-900">{profile.name}</h2>
+            <p className="text-xs font-bold text-slate-600">
+              Level 12 · 17-day streak · 1340 coins
+            </p>
+
+            {/* XP Progress Line */}
+            <div className="mt-3 max-w-md">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-white/60">
+                <div className="h-full rounded-full bg-blue-600" style={{ width: "80%" }} />
+              </div>
+              <p className="mt-1 text-[11px] font-bold text-slate-700">
+                4820 / 6000 XP to Level 13
+              </p>
+            </div>
+          </div>
         </div>
-        <Button variant="outline" className="rounded-full font-bold" onClick={() => setOpen(true)}>
-          Edit profile
+
+        <Button
+          onClick={() => setOpen(true)}
+          className="rounded-full bg-white px-6 py-5 text-xs font-bold text-blue-600 shadow-sm hover:bg-slate-50 border-none active:scale-95"
+        >
+          Edit Profile
         </Button>
       </section>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="card-surface p-4">
-            <p className="text-2xl font-extrabold">{stat.value}</p>
-            <p className="text-sm text-muted-foreground">{stat.label}</p>
+      {/* 4 Stat Cards */}
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {profileStats.map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm"
+          >
+            <h3 className="text-2xl font-black text-slate-900">{stat.value}</h3>
+            <p className="text-xs font-bold text-slate-400">{stat.label}</p>
           </div>
         ))}
-      </div>
+      </section>
 
-      <section className="card-surface p-6">
-        <h2 className="text-xl font-bold">Interests</h2>
-        <p className="text-sm text-muted-foreground">Tap to add or remove a subject.</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {subjects.map((subject) => {
-            const enabled = interests.includes(subject.name);
-            return (
-              <button
-                key={subject.name}
-                type="button"
-                aria-pressed={enabled}
-                onClick={() => {
-                  const added = toggleInterest(subject.name);
-                  toast[added ? "success" : "message"](
-                    added ? `${subject.name} added to interests` : `${subject.name} removed`,
-                  );
-                }}
-                className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
-                  enabled
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                }`}
-              >
-                {subject.emoji} {subject.name}
-              </button>
-            );
-          })}
+      {/* Interests Card */}
+      <section className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-black text-slate-900">Interests</h3>
+        <div className="mt-4 flex flex-wrap gap-3">
+          {interestsList.map((interest) => (
+            <span
+              key={interest.name}
+              className="flex items-center gap-1.5 rounded-full bg-slate-100 px-4 py-2 text-xs font-extrabold text-slate-700 shadow-2xs"
+            >
+              <span>{interest.icon}</span>
+              <span>{interest.name}</span>
+            </span>
+          ))}
         </div>
       </section>
 
+      {/* 2 Columns: Recent Badges & Certificates */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="card-surface p-6">
-          <h2 className="text-xl font-bold">Recent badges</h2>
-          <div className="mt-4 flex flex-wrap gap-4">
-            {badges
-              .filter((badge) => badge.earned)
-              .map((badge) => (
-                <div key={badge.name} className="w-20 text-center">
-                  <span className="text-3xl">{badge.emoji}</span>
-                  <p className="text-xs font-semibold">{badge.name}</p>
+        {/* Recent Badges */}
+        <section className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-black text-slate-900">Recent badges</h3>
+          <div className="mt-6 flex flex-wrap justify-around gap-4 text-center">
+            {recentBadges.map((badge) => (
+              <div key={badge.name} className="flex flex-col items-center">
+                <div className="flex size-16 items-center justify-center rounded-3xl bg-slate-50 text-4xl shadow-2xs">
+                  {badge.icon}
                 </div>
-              ))}
+                <p className="mt-2 text-xs font-extrabold text-slate-800">{badge.name}</p>
+              </div>
+            ))}
           </div>
-          <Button asChild variant="ghost" className="mt-4 rounded-full font-bold">
-            <Link to="/achievements">See all achievements</Link>
-          </Button>
         </section>
 
-        <section className="card-surface p-6">
-          <h2 className="text-xl font-bold">Certificates</h2>
-          <ul className="mt-3 space-y-2 text-sm">
-            {certificates.map((certificate) => (
-              <li key={certificate.title} className="flex justify-between rounded-xl bg-muted/60 px-4 py-2.5">
-                <span className="font-semibold">{certificate.title}</span>
-                <span className="text-muted-foreground">{certificate.date}</span>
-              </li>
+        {/* Certificates */}
+        <section className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <h3 className="text-lg font-black text-slate-900">Certificates</h3>
+          <div className="mt-4 space-y-3">
+            {certificatesList.map((cert) => (
+              <div
+                key={cert.title}
+                className="flex items-center justify-between rounded-2xl bg-blue-50/60 p-3.5"
+              >
+                <span className="text-xs font-bold text-slate-800">{cert.title}</span>
+                <span className="text-[11px] font-semibold text-slate-400">{cert.date}</span>
+              </div>
             ))}
-          </ul>
-          <Button asChild variant="ghost" className="mt-4 rounded-full font-bold">
-            <Link to="/certificates">Download certificates</Link>
-          </Button>
+          </div>
         </section>
       </div>
 
-      <section className="card-surface p-6">
-        <h2 className="text-xl font-bold">Saved courses</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {favourites.length === 0
-            ? "You haven't saved any courses yet - tap the heart on a course card."
-            : `${favourites.length} course${favourites.length === 1 ? "" : "s"} saved for later.`}
-        </p>
-        <Button asChild className="mt-4 rounded-full font-bold">
-          <Link to="/my-learning">Go to my learning</Link>
-        </Button>
-      </section>
-
+      {/* Edit Profile Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="rounded-3xl sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>Change how you show up on Kidzy.</DialogDescription>
+            <DialogTitle className="text-xl font-black">Edit Profile</DialogTitle>
+            <DialogDescription className="font-semibold text-slate-500">
+              Update your display name.
+            </DialogDescription>
           </DialogHeader>
-          <form onSubmit={submit} className="space-y-4" noValidate>
+          <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Display name</Label>
+              <Label htmlFor="name" className="font-bold">Display Name</Label>
               <Input
                 id="name"
-                value={form.name}
-                maxLength={40}
-                aria-invalid={Boolean(errors["name"])}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                className="rounded-full"
               />
-              {errors["name"] && <p className="text-sm font-semibold text-destructive">{errors["name"]}</p>}
             </div>
-
-            <div className="space-y-1.5">
-              <Label>Avatar</Label>
-              <div className="flex flex-wrap gap-2">
-                {avatarChoices.map((avatar) => (
-                  <button
-                    key={avatar}
-                    type="button"
-                    aria-pressed={form.avatar === avatar}
-                    onClick={() => setForm({ ...form, avatar })}
-                    className={`grid size-11 place-items-center rounded-2xl text-xl transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
-                      form.avatar === avatar ? "bg-primary/20 ring-2 ring-primary" : "bg-muted"
-                    }`}
-                  >
-                    {avatar}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="bio">Short bio</Label>
-              <Textarea
-                id="bio"
-                rows={3}
-                maxLength={160}
-                value={form.bio}
-                aria-invalid={Boolean(errors["bio"])}
-                onChange={(e) => setForm({ ...form, bio: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">{form.bio.length}/160</p>
-              {errors["bio"] && <p className="text-sm font-semibold text-destructive">{errors["bio"]}</p>}
-            </div>
-
-            <DialogFooter>
-              <Button type="button" variant="ghost" className="rounded-full font-bold" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={saving} className="rounded-full font-bold">
-                {saving ? "Saving..." : "Save changes"}
-              </Button>
-            </DialogFooter>
-          </form>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)} className="rounded-full font-bold">
+              Cancel
+            </Button>
+            <Button onClick={handleSave} className="rounded-full bg-blue-600 font-bold text-white hover:bg-blue-700">
+              Save Changes
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

@@ -17,6 +17,7 @@ import { MyLearningPage } from "@/pages/MyLearningPage";
 import { NewTicketPage } from "@/pages/NewTicketPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { QuizzesPage } from "@/pages/QuizzesPage";
+import { SettingsPage } from "@/pages/SettingsPage";
 import { SubjectsPage } from "@/pages/SubjectsPage";
 import { SupportChatPage } from "@/pages/SupportChatPage";
 import { SupportHomePage } from "@/pages/SupportHomePage";
@@ -73,6 +74,7 @@ export default function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/courses/:courseId" element={<CourseDetailPage />} />
           <Route path="/support" element={<SupportLayout />}>
             <Route index element={<SupportHomePage />} />

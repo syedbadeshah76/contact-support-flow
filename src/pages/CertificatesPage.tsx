@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Download, Loader2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { certificates } from "@/data/portal";
 import { useAppState } from "@/lib/app-state";
@@ -11,8 +10,8 @@ import { useDocumentMeta } from "@/lib/meta";
 function certificateSvg(name: string, title: string, date: string, grade: string) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
   <rect width="1200" height="800" fill="#fffaf3"/>
-  <rect x="40" y="40" width="1120" height="720" fill="none" stroke="#f26d3d" stroke-width="8" rx="32"/>
-  <text x="600" y="180" text-anchor="middle" font-family="Georgia, serif" font-size="46" fill="#f26d3d">Kidzy Learning Portal</text>
+  <rect x="40" y="40" width="1120" height="720" fill="none" stroke="#2563eb" stroke-width="8" rx="32"/>
+  <text x="600" y="180" text-anchor="middle" font-family="Georgia, serif" font-size="46" fill="#2563eb">EDVANZ Learning Portal</text>
   <text x="600" y="290" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#4a4a4a">Certificate of Completion</text>
   <text x="600" y="400" text-anchor="middle" font-family="Georgia, serif" font-size="60" fill="#222">${name}</text>
   <text x="600" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#4a4a4a">has successfully completed</text>
@@ -23,7 +22,7 @@ function certificateSvg(name: string, title: string, date: string, grade: string
 
 export function CertificatesPage() {
   useDocumentMeta(
-    "Certificates - Kidzy",
+    "Certificates - EDVANZ",
     "Download and share the certificates you've earned for completed courses.",
   );
 
@@ -52,7 +51,7 @@ export function CertificatesPage() {
   };
 
   const share = async (title: string) => {
-    const text = `I completed "${title}" on Kidzy!`;
+    const text = `I completed "${title}" on EDVANZ!`;
     const url = window.location.href;
     try {
       if (navigator.share) {
@@ -67,43 +66,55 @@ export function CertificatesPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-7">
-      <PageHeader
-        eyebrow="Proof of work"
-        title="Certificates"
-        description="Every finished course gets a shareable certificate with your name on it."
-      />
+    <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-12">
+      {/* Header */}
+      <div>
+        <p className="text-xs font-black uppercase tracking-wider text-blue-600">PROOF OF WORK</p>
+        <h1 className="mt-1 text-3xl font-black text-slate-900 sm:text-4xl">Certificates</h1>
+        <p className="mt-1 text-sm font-semibold text-slate-500">
+          Every finished course gets a shareable certificate with your name on it.
+        </p>
+      </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      {/* Grid of 3 Cards */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {certificates.map((certificate) => (
-          <article key={certificate.title} className="card-surface overflow-hidden">
-            <div className="grid h-32 place-items-center bg-soft-gradient text-5xl">🎓</div>
-            <div className="space-y-3 p-5">
+          <article
+            key={certificate.title}
+            className="flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-sm transition-transform duration-200 hover:-translate-y-1"
+          >
+            <div className="grid h-36 place-items-center bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 text-6xl shadow-inner">
+              🎓
+            </div>
+
+            <div className="flex flex-1 flex-col justify-between p-6">
               <div>
-                <h2 className="text-lg font-bold">{certificate.title}</h2>
-                <p className="text-sm text-muted-foreground">
-                  Completed {certificate.date} · Grade {certificate.grade} · {profile.name}
+                <h2 className="text-base font-black text-slate-900">{certificate.title}</h2>
+                <p className="mt-1 text-xs font-semibold text-slate-400">
+                  Completed {certificate.date} · Grade {certificate.grade}
                 </p>
               </div>
-              <div className="flex gap-2">
+
+              <div className="mt-6 flex gap-3">
                 <Button
-                  className="flex-1 rounded-full font-bold"
-                  disabled={downloading === certificate.title}
                   onClick={() => download(certificate)}
+                  disabled={downloading === certificate.title}
+                  className="flex-1 rounded-full bg-blue-600 py-5 text-xs font-bold text-white shadow-sm hover:bg-blue-700 active:scale-95"
                 >
                   {downloading === certificate.title ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    <Download className="size-4" />
+                    <Download className="mr-1.5 size-4" />
                   )}
                   {downloading === certificate.title ? "Preparing..." : "Download"}
                 </Button>
+
                 <Button
                   variant="outline"
-                  className="rounded-full font-bold"
                   onClick={() => share(certificate.title)}
+                  className="rounded-full border-blue-200 px-5 py-5 text-xs font-bold text-blue-600 hover:bg-blue-50 active:scale-95"
                 >
-                  <Share2 className="size-4" /> Share
+                  <Share2 className="mr-1 size-4 text-blue-600" /> Share
                 </Button>
               </div>
             </div>
