@@ -24,7 +24,9 @@ export const Route = createFileRoute("/explore")({
       },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { q?: string; subject?: string } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { q?: string | undefined; subject?: string | undefined } => ({
     q: typeof search['q'] === "string" ? search['q'].slice(0, 80) : undefined,
     subject: typeof search['subject'] === "string" ? search['subject'] : undefined,
   }),
