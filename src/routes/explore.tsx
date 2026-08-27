@@ -24,9 +24,9 @@ export const Route = createFileRoute("/explore")({
       },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search.q === "string" ? search.q.slice(0, 80) : "",
-    subject: typeof search.subject === "string" ? search.subject : "All",
+  validateSearch: (search: Record<string, unknown>): { q?: string; subject?: string } => ({
+    q: typeof search['q'] === "string" ? search['q'].slice(0, 80) : undefined,
+    subject: typeof search['subject'] === "string" ? search['subject'] : undefined,
   }),
   component: Explore,
 });
@@ -35,7 +35,7 @@ const levels = ["All levels", "Beginner", "Intermediate", "Advanced"] as const;
 const prices = ["All", "Free", "Premium"] as const;
 
 function Explore() {
-  const { q, subject } = Route.useSearch();
+  const { q = "", subject = "All" } = Route.useSearch();
   const navigate = useNavigate({ from: "/explore" });
   const query = q;
   const setQuery = (value: string) =>
