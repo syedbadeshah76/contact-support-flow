@@ -1,31 +1,21 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { PageHeader } from "@/components/PageHeader";
-import { Button } from "@/components/ui/button";
 import { StatusPill } from "@/components/StatusPill";
+import { Button } from "@/components/ui/button";
 import { statusFilters, tickets } from "@/data/support";
+import { useDocumentMeta } from "@/lib/meta";
 
-const title = "My support requests — Kidzy Learning Portal";
-const description =
-  "Track the status of every support ticket you've raised with the Kidzy help crew.";
+const title = "My support requests - Kidzy Learning Portal";
+const description = "Track the status of every support ticket you've raised with the Kidzy help crew.";
 
-export const Route = createFileRoute("/support/tickets/")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-    ],
-  }),
-  component: TicketList,
-});
+export function TicketListPage() {
+  useDocumentMeta(title, description);
 
-function TicketList() {
   const [filter, setFilter] = useState<string>("All");
-  const visible = tickets.filter((t) => filter === "All" || t.status === filter);
+  const visible = tickets.filter((ticket) => filter === "All" || ticket.status === filter);
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,40 +40,39 @@ function TicketList() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        {statusFilters.map((s) => (
+        {statusFilters.map((status) => (
           <button
-            key={s}
-            onClick={() => setFilter(s)}
+            key={status}
+            onClick={() => setFilter(status)}
             className={`rounded-full px-4 py-1.5 text-sm font-bold transition-colors ${
-              filter === s
+              filter === status
                 ? "bg-primary text-primary-foreground shadow-pop"
                 : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             }`}
           >
-            {s}
+            {status}
           </button>
         ))}
       </div>
 
       <div className="space-y-4">
-        {visible.map((t) => (
+        {visible.map((ticket) => (
           <Link
-            key={t.id}
-            to="/support/tickets/$ticketId"
-            params={{ ticketId: t.id }}
+            key={ticket.id}
+            to={`/support/tickets/${ticket.id}`}
             className="card-surface flex flex-wrap items-center gap-4 p-5 transition-transform hover:-translate-y-0.5"
           >
             <span className="grid size-12 place-items-center rounded-2xl bg-muted text-2xl">
-              {t.agent.avatar}
+              {ticket.agent.avatar}
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-bold text-muted-foreground">{t.id}</span>
-                <StatusPill status={t.status} />
+                <span className="text-xs font-bold text-muted-foreground">{ticket.id}</span>
+                <StatusPill status={ticket.status} />
               </div>
-              <h2 className="mt-1 truncate text-lg font-bold">{t.subject}</h2>
+              <h2 className="mt-1 truncate text-lg font-bold">{ticket.subject}</h2>
               <p className="text-sm text-muted-foreground">
-                {t.category} · {t.priority} priority · updated {t.updated}
+                {ticket.category} · {ticket.priority} priority · updated {ticket.updated}
               </p>
             </div>
             <span className="text-sm font-bold text-primary">View thread →</span>
@@ -93,9 +82,7 @@ function TicketList() {
           <div className="card-surface p-10 text-center">
             <p className="text-3xl">🎉</p>
             <h2 className="mt-2 text-xl font-bold">Nothing here</h2>
-            <p className="text-sm text-muted-foreground">
-              No tickets with the status “{filter}”.
-            </p>
+            <p className="text-sm text-muted-foreground">No tickets with the status "{filter}".</p>
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   BookOpenCheck,
@@ -11,17 +11,17 @@ import {
   Medal,
   ScrollText,
   UserRound,
-  LifeBuoy,
-  Ticket,
-  MessagesSquare,
+  Settings,
 } from "lucide-react";
 
+import { EdvanzLogo } from "@/components/EdvanzLogo";
+import pandaAvatar from "@/assets/panda-avatar.jpg";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -29,118 +29,90 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const learnItems = [
+const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "My Learning", url: "/my-learning", icon: BookOpenCheck },
   { title: "Explore Courses", url: "/explore", icon: Compass },
   { title: "Subjects", url: "/subjects", icon: Shapes },
   { title: "Learning Path", url: "/learning-path", icon: RouteIcon },
   { title: "Live Classes", url: "/live-classes", icon: Video },
-];
-
-const playItems = [
   { title: "Quizzes", url: "/quizzes", icon: Brain },
   { title: "Achievements", url: "/achievements", icon: Trophy },
   { title: "Leaderboard", url: "/leaderboard", icon: Medal },
   { title: "Certificates", url: "/certificates", icon: ScrollText },
   { title: "Profile", url: "/profile", icon: UserRound },
-];
-
-const helpItems = [
-  { title: "Help Centre", url: "/support", icon: LifeBuoy },
-  { title: "My Requests", url: "/support/tickets", icon: Ticket },
-  { title: "Live Chat", url: "/support/chat", icon: MessagesSquare },
+  { title: "Settings", url: "/profile", icon: Settings },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { pathname } = useLocation();
   const collapsed = state === "collapsed";
-  const currentPath = useRouterState({ select: (r) => r.location.pathname });
-  const isActive = (path: string) => currentPath === path;
+  const isActive = (path: string) =>
+    pathname === path || (path !== "/" && pathname.startsWith(`${path}/`));
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
-      <SidebarHeader className="px-3 py-4">
-        <Link to="/" className="flex items-center gap-2.5">
-          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-hero-gradient text-lg shadow-pop">
-            🚀
-          </span>
-          {!collapsed && (
-            <span className="font-display text-xl font-extrabold tracking-tight">
-              Kidzy
-            </span>
-          )}
+    <Sidebar collapsible="icon" className="border-r border-slate-100 bg-white">
+      <SidebarHeader className="px-6 pt-6 pb-4">
+        <Link to="/" className="flex items-center">
+          <EdvanzLogo collapsed={collapsed} />
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="px-1">
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>Learn</SidebarGroupLabel>}
+      <SidebarContent className="flex flex-col justify-between px-3 pb-6">
+        <SidebarGroup className="p-0">
           <SidebarGroupContent>
-            <SidebarMenu>
-              {learnItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    tooltip={item.title}
-                    className="rounded-xl"
-                  >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="size-4.5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+            <SidebarMenu className="gap-1.5">
+              {navItems.map((item) => {
+                const active = isActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={active}
+                      tooltip={item.title}
+                      className={`h-11 rounded-2xl px-4 transition-all ${
+                        active
+                          ? "bg-blue-50/90 text-blue-600 font-extrabold shadow-2xs"
+                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900 font-semibold"
+                      }`}
+                    >
+                      <Link to={item.url} className="flex items-center gap-3.5">
+                        <item.icon
+                          className={`size-5 stroke-[2.2] ${
+                            active ? "text-blue-600" : "text-slate-600"
+                          }`}
+                        />
+                        <span className="text-sm tracking-tight">{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>Play & progress</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {playItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    tooltip={item.title}
-                    className="rounded-xl"
-                  >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="size-4.5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          {!collapsed && <SidebarGroupLabel>Help</SidebarGroupLabel>}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {helpItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.url)}
-                    tooltip={item.title}
-                    className="rounded-xl"
-                  >
-                    <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="size-4.5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {!collapsed && (
+          <div className="mt-6 rounded-3xl border border-slate-100 bg-slate-50/80 p-4 text-center">
+            <div className="mx-auto mb-2 size-16 overflow-hidden rounded-2xl shadow-xs">
+              <img
+                src={pandaAvatar}
+                alt="Panda Support Assistant"
+                className="size-full object-cover"
+              />
+            </div>
+            <h4 className="text-sm font-bold text-slate-800">Need Help?</h4>
+            <p className="mt-0.5 text-xs text-slate-500">We are here to help you!</p>
+            <Button
+              asChild
+              size="sm"
+              className="mt-3 w-full rounded-xl bg-blue-100 text-xs font-bold text-blue-600 hover:bg-blue-200 hover:text-blue-700 shadow-none border-none"
+            >
+              <Link to="/support">Contact Support</Link>
+            </Button>
+          </div>
+        )}
       </SidebarContent>
     </Sidebar>
   );

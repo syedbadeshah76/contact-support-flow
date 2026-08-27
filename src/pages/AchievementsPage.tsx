@@ -1,29 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-
 import { PageHeader } from "@/components/PageHeader";
 import { Progress } from "@/components/ui/progress";
 import { badges, learner } from "@/data/portal";
+import { useDocumentMeta } from "@/lib/meta";
 
-export const Route = createFileRoute("/achievements")({
-  head: () => ({
-    meta: [
-      { title: "Achievements — Kidzy" },
-      {
-        name: "description",
-        content: "Badges, XP history and milestones you've unlocked on your learning journey.",
-      },
-      { property: "og:title", content: "Achievements — Kidzy" },
-      {
-        property: "og:description",
-        content: "Badges, XP history and milestones you've unlocked.",
-      },
-    ],
-  }),
-  component: Achievements,
-});
+export function AchievementsPage() {
+  useDocumentMeta(
+    "Achievements - Kidzy",
+    "Badges, XP history and milestones you've unlocked on your learning journey.",
+  );
 
-function Achievements() {
-  const earned = badges.filter((b) => b.earned).length;
+  const earned = badges.filter((badge) => badge.earned).length;
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-7">
@@ -50,18 +36,18 @@ function Achievements() {
         />
       </div>
 
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-        {badges.map((b) => (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        {badges.map((badge) => (
           <div
-            key={b.name}
+            key={badge.name}
             className={`card-surface flex flex-col items-center gap-2 p-6 text-center ${
-              b.earned ? "" : "opacity-45 grayscale"
+              badge.earned ? "" : "opacity-45 grayscale"
             }`}
           >
-            <span className="text-4xl">{b.emoji}</span>
-            <p className="font-bold">{b.name}</p>
+            <span className="text-4xl">{badge.emoji}</span>
+            <p className="font-bold">{badge.name}</p>
             <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-bold text-muted-foreground">
-              {b.tier}
+              {badge.tier}
             </span>
           </div>
         ))}

@@ -1,6 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Video, Bell, BellRing, Loader2 } from "lucide-react";
+import { Bell, BellRing, Loader2, Video } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
@@ -15,35 +14,23 @@ import {
 } from "@/components/ui/dialog";
 import { liveClasses } from "@/data/portal";
 import { useAppState } from "@/lib/app-state";
+import { useDocumentMeta } from "@/lib/meta";
 
-export const Route = createFileRoute("/live-classes")({
-  head: () => ({
-    meta: [
-      { title: "Live Classes — Kidzy" },
-      {
-        name: "description",
-        content: "Join small-group live classes with real teachers and ask questions in real time.",
-      },
-      { property: "og:title", content: "Live Classes — Kidzy" },
-      {
-        property: "og:description",
-        content: "Join small-group live classes with real teachers.",
-      },
-    ],
-  }),
-  component: LiveClasses,
-});
+export function LiveClassesPage() {
+  useDocumentMeta(
+    "Live Classes - Kidzy",
+    "Join small-group live classes with real teachers and ask questions in real time.",
+  );
 
-function LiveClasses() {
   const { reminders, toggleReminder } = useAppState();
   const [joining, setJoining] = useState<string | null>(null);
-  const [open, setOpen] = useState<(typeof liveClasses)[number] | null>(null);
+  const [openClass, setOpenClass] = useState<(typeof liveClasses)[number] | null>(null);
 
-  const join = async (l: (typeof liveClasses)[number]) => {
-    setJoining(l.topic);
-    await new Promise((r) => setTimeout(r, 700));
+  const join = async (liveClass: (typeof liveClasses)[number]) => {
+    setJoining(liveClass.topic);
+    await new Promise((resolve) => setTimeout(resolve, 700));
     setJoining(null);
-    setOpen(l);
+    setOpenClass(liveClass);
   };
 
   return (
@@ -55,11 +42,11 @@ function LiveClasses() {
       />
 
       <div className="grid gap-5">
-        {liveClasses.map((l) => {
-          const reminded = reminders.includes(l.topic);
+        {liveClasses.map((liveClass) => {
+          const reminded = reminders.includes(liveClass.topic);
           return (
             <article
-              key={l.topic}
+              key={liveClass.topic}
               className="card-surface flex flex-wrap items-center justify-between gap-4 p-6 transition-transform hover:-translate-y-0.5"
             >
               <div className="flex items-center gap-4">
@@ -67,37 +54,41 @@ function LiveClasses() {
                   <Video className="size-6" />
                 </span>
                 <div>
-                  <h2 className="text-lg font-bold">{l.topic}</h2>
+                  <h2 className="text-lg font-bold">{liveClass.topic}</h2>
                   <p className="text-sm text-muted-foreground">
-                    {l.teacher} · {l.time}
+                    {liveClass.teacher} · {liveClass.time}
                   </p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-sun/30 px-3 py-1.5 text-sm font-bold text-sun-foreground">
-                  Starts {l.countdown}
+                  Starts {liveClass.countdown}
                 </span>
                 <Button
                   variant="outline"
                   className="rounded-full font-bold"
                   aria-pressed={reminded}
                   onClick={() => {
-                    const on = toggleReminder(l.topic);
-                    toast[on ? "success" : "message"](
-                      on ? `Reminder set for ${l.topic}` : `Reminder removed`,
+                    const enabled = toggleReminder(liveClass.topic);
+                    toast[enabled ? "success" : "message"](
+                      enabled ? `Reminder set for ${liveClass.topic}` : "Reminder removed",
                     );
                   }}
                 >
-                  {reminded ? <BellRing className="size-4 text-primary" /> : <Bell className="size-4" />}
+                  {reminded ? (
+                    <BellRing className="size-4 text-primary" />
+                  ) : (
+                    <Bell className="size-4" />
+                  )}
                   {reminded ? "Reminder on" : "Remind me"}
                 </Button>
                 <Button
                   className="rounded-full font-bold"
-                  disabled={joining === l.topic}
-                  onClick={() => join(l)}
+                  disabled={joining === liveClass.topic}
+                  onClick={() => join(liveClass)}
                 >
-                  {joining === l.topic && <Loader2 className="size-4 animate-spin" />}
-                  {joining === l.topic ? "Connecting…" : "Join class"}
+                  {joining === liveClass.topic && <Loader2 className="size-4 animate-spin" />}
+                  {joining === liveClass.topic ? "Connecting..." : "Join class"}
                 </Button>
               </div>
             </article>
@@ -105,19 +96,19 @@ function LiveClasses() {
         })}
       </div>
 
-      <Dialog open={open !== null} onOpenChange={(o) => !o && setOpen(null)}>
+      <Dialog open={openClass !== null} onOpenChange={(isOpen) => !isOpen && setOpenClass(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{open?.topic}</DialogTitle>
+            <DialogTitle>{openClass?.topic}</DialogTitle>
             <DialogDescription>
-              {open?.teacher} · {open?.time}
+              {openClass?.teacher} · {openClass?.time}
             </DialogDescription>
           </DialogHeader>
           <div className="grid h-40 place-items-center rounded-2xl bg-soft-gradient text-5xl">
             🎥
           </div>
           <p className="text-sm text-muted-foreground">
-            The classroom opens 5 minutes before start. Mic and camera are optional — the
+            The classroom opens 5 minutes before start. Mic and camera are optional - the
             chat is always open.
           </p>
           <DialogFooter>
@@ -127,7 +118,7 @@ function LiveClasses() {
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(
-                    `${window.location.origin}/live-classes#${encodeURIComponent(open?.topic ?? "")}`,
+                    `${window.location.origin}/live-classes#${encodeURIComponent(openClass?.topic ?? "")}`,
                   );
                   toast.success("Class link copied");
                 } catch {
@@ -141,7 +132,7 @@ function LiveClasses() {
               className="rounded-full font-bold"
               onClick={() => {
                 toast.success("You're in the waiting room 🎉");
-                setOpen(null);
+                setOpenClass(null);
               }}
             >
               Enter classroom

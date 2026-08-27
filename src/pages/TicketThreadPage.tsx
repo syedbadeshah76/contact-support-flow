@@ -1,44 +1,32 @@
-import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Send } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
+import { NotFoundPage } from "@/App";
 import { StatusPill } from "@/components/StatusPill";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { tickets, type TicketMessage } from "@/data/support";
+import { useDocumentMeta } from "@/lib/meta";
 
-export const Route = createFileRoute("/support/tickets/$ticketId")({
-  loader: ({ params }) => {
-    const ticket = tickets.find((t) => t.id === params.ticketId);
-    if (!ticket) throw notFound();
-    return { ticket };
-  },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return {
-        meta: [{ title: "Ticket not found" }, { name: "robots", content: "noindex" }],
-      };
-    }
-    const title = `${loaderData.ticket.id} · ${loaderData.ticket.subject} — Kidzy Support`;
-    const description = `Support thread ${loaderData.ticket.id} about ${loaderData.ticket.category}.`;
-    return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-      ],
-    };
-  },
-  component: TicketThread,
-});
+export function TicketThreadPage() {
+  const { ticketId } = useParams<{ ticketId: string }>();
+  const ticket = tickets.find((entry) => entry.id === ticketId);
 
-function TicketThread() {
-  const { ticket } = Route.useLoaderData();
+  useDocumentMeta(
+    ticket ? `${ticket.id} - ${ticket.subject} - Kidzy Support` : "Ticket not found",
+    ticket ? `Support thread ${ticket.id} about ${ticket.category}.` : "This support ticket could not be found.",
+    ticket ? undefined : { robots: "noindex" },
+  );
+
   const [reply, setReply] = useState("");
 
-  const send = () => {
+  if (!ticket) {
+    return <NotFoundPage />;
+  }
+
+  const sendReply = () => {
     if (reply.trim().length < 2) {
       toast.error("Write a reply first");
       return;
@@ -66,8 +54,7 @@ function TicketThread() {
         </div>
         <h1 className="mt-2 text-2xl font-extrabold sm:text-3xl">{ticket.subject}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {ticket.category} · updated {ticket.updated} · helper {ticket.agent.avatar}{" "}
-          {ticket.agent.name}
+          {ticket.category} · updated {ticket.updated} · helper {ticket.agent.avatar} {ticket.agent.name}
         </p>
       </div>
 
@@ -75,25 +62,23 @@ function TicketThread() {
         <section className="card-surface space-y-4 p-5 sm:p-6">
           <h2 className="text-lg font-bold">Conversation</h2>
           <ul className="space-y-4">
-            {ticket.messages.map((m: TicketMessage, i: number) => (
+            {ticket.messages.map((message: TicketMessage, index: number) => (
               <li
-                key={i}
-                className={`flex gap-3 ${m.from === "you" ? "flex-row-reverse" : ""}`}
+                key={`${message.time}-${index}`}
+                className={`flex gap-3 ${message.from === "you" ? "flex-row-reverse" : ""}`}
               >
                 <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-muted text-xl">
-                  {m.from === "you" ? "🦊" : ticket.agent.avatar}
+                  {message.from === "you" ? "🦊" : ticket.agent.avatar}
                 </span>
                 <div
                   className={`max-w-md rounded-2xl px-4 py-3 ${
-                    m.from === "you"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                    message.from === "you" ? "bg-primary text-primary-foreground" : "bg-muted"
                   }`}
                 >
                   <p className="text-xs font-bold opacity-80">
-                    {m.name} · {m.time}
+                    {message.name} · {message.time}
                   </p>
-                  <p className="mt-1 text-sm">{m.body}</p>
+                  <p className="mt-1 text-sm">{message.body}</p>
                 </div>
               </li>
             ))}
@@ -104,19 +89,15 @@ function TicketThread() {
               value={reply}
               rows={4}
               maxLength={1000}
-              placeholder="Add a reply for the support crew…"
+              placeholder="Add a reply for the support crew..."
               onChange={(e) => setReply(e.target.value)}
               aria-label="Reply to ticket"
             />
             <div className="flex justify-end gap-2">
-              <Button
-                variant="ghost"
-                className="rounded-full font-bold"
-                onClick={() => toast("Ticket marked as resolved")}
-              >
+              <Button variant="ghost" className="rounded-full font-bold" onClick={() => toast("Ticket marked as resolved")}>
                 Mark resolved
               </Button>
-              <Button onClick={send} className="rounded-full font-bold">
+              <Button onClick={sendReply} className="rounded-full font-bold">
                 <Send className="size-4" /> Send reply
               </Button>
             </div>
@@ -132,11 +113,11 @@ function TicketThread() {
                 ["Category", ticket.category],
                 ["Status", ticket.status],
                 ["Priority", ticket.priority],
-                ["Helper", `${ticket.agent.name}`],
-              ].map(([k, v]) => (
-                <div key={k} className="flex justify-between gap-3">
-                  <dt className="text-muted-foreground">{k}</dt>
-                  <dd className="font-bold">{v}</dd>
+                ["Helper", ticket.agent.name],
+              ].map(([key, value]) => (
+                <div key={key} className="flex justify-between gap-3">
+                  <dt className="text-muted-foreground">{key}</dt>
+                  <dd className="font-bold">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -146,11 +127,7 @@ function TicketThread() {
             <Button asChild className="mt-3 w-full rounded-full font-bold">
               <Link to="/support/chat">Chat with a helper</Link>
             </Button>
-            <Button
-              asChild
-              variant="ghost"
-              className="mt-2 w-full rounded-full font-bold"
-            >
+            <Button asChild variant="ghost" className="mt-2 w-full rounded-full font-bold">
               <Link to="/support">Browse help articles</Link>
             </Button>
           </div>

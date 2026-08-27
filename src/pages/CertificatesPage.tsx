@@ -1,30 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Download, Share2, Loader2 } from "lucide-react";
+import { Download, Loader2, Share2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { certificates } from "@/data/portal";
 import { useAppState } from "@/lib/app-state";
-
-export const Route = createFileRoute("/certificates")({
-  head: () => ({
-    meta: [
-      { title: "Certificates — Kidzy" },
-      {
-        name: "description",
-        content: "Download and share the certificates you've earned for completed courses.",
-      },
-      { property: "og:title", content: "Certificates — Kidzy" },
-      {
-        property: "og:description",
-        content: "Download and share certificates for completed courses.",
-      },
-    ],
-  }),
-  component: Certificates,
-});
+import { useDocumentMeta } from "@/lib/meta";
 
 function certificateSvg(name: string, title: string, date: string, grade: string) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
@@ -39,36 +21,41 @@ function certificateSvg(name: string, title: string, date: string, grade: string
 </svg>`;
 }
 
-function Certificates() {
+export function CertificatesPage() {
+  useDocumentMeta(
+    "Certificates - Kidzy",
+    "Download and share the certificates you've earned for completed courses.",
+  );
+
   const { profile } = useAppState();
   const [downloading, setDownloading] = useState<string | null>(null);
 
-  const download = async (c: (typeof certificates)[number]) => {
-    setDownloading(c.title);
+  const download = async (certificate: (typeof certificates)[number]) => {
+    setDownloading(certificate.title);
     try {
-      const svg = certificateSvg(profile.name, c.title, c.date, c.grade);
+      const svg = certificateSvg(profile.name, certificate.title, certificate.date, certificate.grade);
       const blob = new Blob([svg], { type: "image/svg+xml" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${c.title.replace(/\s+/g, "-").toLowerCase()}-certificate.svg`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${certificate.title.replace(/\s+/g, "-").toLowerCase()}-certificate.svg`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
       URL.revokeObjectURL(url);
       toast.success("Certificate downloaded");
     } catch {
-      toast.error("Download failed — please try again");
+      toast.error("Download failed - please try again");
     } finally {
       setDownloading(null);
     }
   };
 
   const share = async (title: string) => {
-    const text = `I completed "${title}" on Kidzy! 🎓`;
-    const url = typeof window !== "undefined" ? window.location.href : "";
+    const text = `I completed "${title}" on Kidzy!`;
+    const url = window.location.href;
     try {
-      if (typeof navigator !== "undefined" && navigator.share) {
+      if (navigator.share) {
         await navigator.share({ title, text, url });
         return;
       }
@@ -88,33 +75,33 @@ function Certificates() {
       />
 
       <div className="grid gap-5 sm:grid-cols-2">
-        {certificates.map((c) => (
-          <article key={c.title} className="card-surface overflow-hidden">
+        {certificates.map((certificate) => (
+          <article key={certificate.title} className="card-surface overflow-hidden">
             <div className="grid h-32 place-items-center bg-soft-gradient text-5xl">🎓</div>
             <div className="space-y-3 p-5">
               <div>
-                <h2 className="text-lg font-bold">{c.title}</h2>
+                <h2 className="text-lg font-bold">{certificate.title}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Completed {c.date} · Grade {c.grade} · {profile.name}
+                  Completed {certificate.date} · Grade {certificate.grade} · {profile.name}
                 </p>
               </div>
               <div className="flex gap-2">
                 <Button
                   className="flex-1 rounded-full font-bold"
-                  disabled={downloading === c.title}
-                  onClick={() => download(c)}
+                  disabled={downloading === certificate.title}
+                  onClick={() => download(certificate)}
                 >
-                  {downloading === c.title ? (
+                  {downloading === certificate.title ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
                     <Download className="size-4" />
                   )}
-                  {downloading === c.title ? "Preparing…" : "Download"}
+                  {downloading === certificate.title ? "Preparing..." : "Download"}
                 </Button>
                 <Button
                   variant="outline"
                   className="rounded-full font-bold"
-                  onClick={() => share(c.title)}
+                  onClick={() => share(certificate.title)}
                 >
                   <Share2 className="size-4" /> Share
                 </Button>

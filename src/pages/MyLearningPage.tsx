@@ -1,31 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import { PageHeader } from "@/components/PageHeader";
 import { CourseCard } from "@/components/CourseCard";
+import { PageHeader } from "@/components/PageHeader";
 import { Progress } from "@/components/ui/progress";
 import { continueLearning, popularCourses } from "@/data/portal";
+import { useDocumentMeta } from "@/lib/meta";
 
-export const Route = createFileRoute("/my-learning")({
-  head: () => ({
-    meta: [
-      { title: "My Learning — Kidzy" },
-      {
-        name: "description",
-        content: "Pick up every course you started and track lesson-by-lesson progress.",
-      },
-      { property: "og:title", content: "My Learning — Kidzy" },
-      {
-        property: "og:description",
-        content: "Pick up every course you started and track lesson-by-lesson progress.",
-      },
-    ],
-  }),
-  component: MyLearning,
-});
+export function MyLearningPage() {
+  useDocumentMeta(
+    "My Learning - Kidzy",
+    "Pick up every course you started and track lesson-by-lesson progress.",
+  );
 
-function MyLearning() {
   const avg = Math.round(
-    continueLearning.reduce((a, c) => a + (c.progress ?? 0), 0) / continueLearning.length,
+    continueLearning.reduce((sum, course) => sum + (course.progress ?? 0), 0) /
+      continueLearning.length,
   );
 
   return (
@@ -45,16 +32,16 @@ function MyLearning() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {continueLearning.map((c) => (
-          <CourseCard key={c.id} course={c} />
+        {continueLearning.map((course) => (
+          <CourseCard key={course.id} course={course} />
         ))}
       </div>
 
       <section className="space-y-4">
         <h2 className="text-2xl font-extrabold">Saved for later</h2>
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {popularCourses.slice(0, 3).map((c) => (
-            <CourseCard key={c.id} course={c} />
+          {popularCourses.slice(0, 3).map((course) => (
+            <CourseCard key={course.id} course={course} />
           ))}
         </div>
       </section>

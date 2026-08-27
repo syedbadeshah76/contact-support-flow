@@ -1,14 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { PageHeader } from "@/components/PageHeader";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -17,26 +13,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
 import { badges, certificates, learner, stats, subjects } from "@/data/portal";
 import { useAppState } from "@/lib/app-state";
-
-export const Route = createFileRoute("/profile")({
-  head: () => ({
-    meta: [
-      { title: "Profile — Kidzy" },
-      {
-        name: "description",
-        content: "Your Kidzy profile: level, XP, interests, badges and certificates.",
-      },
-      { property: "og:title", content: "Profile — Kidzy" },
-      {
-        property: "og:description",
-        content: "Your Kidzy profile: level, XP, interests, badges and certificates.",
-      },
-    ],
-  }),
-  component: Profile,
-});
+import { useDocumentMeta } from "@/lib/meta";
 
 const profileSchema = z.object({
   name: z
@@ -50,7 +33,12 @@ const profileSchema = z.object({
 
 const avatarChoices = ["🦊", "🐼", "🦄", "🐯", "🐧", "🦁", "🐨", "🐸"];
 
-function Profile() {
+export function ProfilePage() {
+  useDocumentMeta(
+    "Profile - Kidzy",
+    "Your Kidzy profile: level, XP, interests, badges and certificates.",
+  );
+
   const { profile, saveProfile, interests, toggleInterest, favourites } = useAppState();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(profile);
@@ -69,9 +57,10 @@ function Profile() {
       toast.error("Please fix the highlighted fields");
       return;
     }
+
     setErrors({});
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     saveProfile(parsed.data);
     setSaving(false);
     setOpen(false);
@@ -92,28 +81,21 @@ function Profile() {
             Level {learner.level} · {learner.streak}-day streak · {learner.coins} coins
           </p>
           {profile.bio && <p className="mt-1 text-sm">{profile.bio}</p>}
-          <Progress
-            value={Math.round((learner.xp / learner.xpToNext) * 100)}
-            className="mt-3 h-2"
-          />
+          <Progress value={Math.round((learner.xp / learner.xpToNext) * 100)} className="mt-3 h-2" />
           <p className="mt-1 text-xs font-semibold text-muted-foreground">
             {learner.xp} / {learner.xpToNext} XP to Level {learner.level + 1}
           </p>
         </div>
-        <Button
-          variant="outline"
-          className="rounded-full font-bold"
-          onClick={() => setOpen(true)}
-        >
+        <Button variant="outline" className="rounded-full font-bold" onClick={() => setOpen(true)}>
           Edit profile
         </Button>
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((s) => (
-          <div key={s.label} className="card-surface p-4">
-            <p className="text-2xl font-extrabold">{s.value}</p>
-            <p className="text-sm text-muted-foreground">{s.label}</p>
+        {stats.map((stat) => (
+          <div key={stat.label} className="card-surface p-4">
+            <p className="text-2xl font-extrabold">{stat.value}</p>
+            <p className="text-sm text-muted-foreground">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -122,26 +104,26 @@ function Profile() {
         <h2 className="text-xl font-bold">Interests</h2>
         <p className="text-sm text-muted-foreground">Tap to add or remove a subject.</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {subjects.map((s) => {
-            const on = interests.includes(s.name);
+          {subjects.map((subject) => {
+            const enabled = interests.includes(subject.name);
             return (
               <button
-                key={s.name}
+                key={subject.name}
                 type="button"
-                aria-pressed={on}
+                aria-pressed={enabled}
                 onClick={() => {
-                  const added = toggleInterest(s.name);
+                  const added = toggleInterest(subject.name);
                   toast[added ? "success" : "message"](
-                    added ? `${s.name} added to interests` : `${s.name} removed`,
+                    added ? `${subject.name} added to interests` : `${subject.name} removed`,
                   );
                 }}
                 className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
-                  on
+                  enabled
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                 }`}
               >
-                {s.emoji} {s.name}
+                {subject.emoji} {subject.name}
               </button>
             );
           })}
@@ -153,11 +135,11 @@ function Profile() {
           <h2 className="text-xl font-bold">Recent badges</h2>
           <div className="mt-4 flex flex-wrap gap-4">
             {badges
-              .filter((b) => b.earned)
-              .map((b) => (
-                <div key={b.name} className="w-20 text-center">
-                  <span className="text-3xl">{b.emoji}</span>
-                  <p className="text-xs font-semibold">{b.name}</p>
+              .filter((badge) => badge.earned)
+              .map((badge) => (
+                <div key={badge.name} className="w-20 text-center">
+                  <span className="text-3xl">{badge.emoji}</span>
+                  <p className="text-xs font-semibold">{badge.name}</p>
                 </div>
               ))}
           </div>
@@ -169,10 +151,10 @@ function Profile() {
         <section className="card-surface p-6">
           <h2 className="text-xl font-bold">Certificates</h2>
           <ul className="mt-3 space-y-2 text-sm">
-            {certificates.map((c) => (
-              <li key={c.title} className="flex justify-between rounded-xl bg-muted/60 px-4 py-2.5">
-                <span className="font-semibold">{c.title}</span>
-                <span className="text-muted-foreground">{c.date}</span>
+            {certificates.map((certificate) => (
+              <li key={certificate.title} className="flex justify-between rounded-xl bg-muted/60 px-4 py-2.5">
+                <span className="font-semibold">{certificate.title}</span>
+                <span className="text-muted-foreground">{certificate.date}</span>
               </li>
             ))}
           </ul>
@@ -186,7 +168,7 @@ function Profile() {
         <h2 className="text-xl font-bold">Saved courses</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           {favourites.length === 0
-            ? "You haven't saved any courses yet — tap the heart on a course card."
+            ? "You haven't saved any courses yet - tap the heart on a course card."
             : `${favourites.length} course${favourites.length === 1 ? "" : "s"} saved for later.`}
         </p>
         <Button asChild className="mt-4 rounded-full font-bold">
@@ -207,28 +189,26 @@ function Profile() {
                 id="name"
                 value={form.name}
                 maxLength={40}
-                aria-invalid={!!errors['name']}
+                aria-invalid={Boolean(errors["name"])}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
               />
-              {errors['name'] && (
-                <p className="text-sm font-semibold text-destructive">{errors['name']}</p>
-              )}
+              {errors["name"] && <p className="text-sm font-semibold text-destructive">{errors["name"]}</p>}
             </div>
 
             <div className="space-y-1.5">
               <Label>Avatar</Label>
               <div className="flex flex-wrap gap-2">
-                {avatarChoices.map((a) => (
+                {avatarChoices.map((avatar) => (
                   <button
-                    key={a}
+                    key={avatar}
                     type="button"
-                    aria-pressed={form.avatar === a}
-                    onClick={() => setForm({ ...form, avatar: a })}
+                    aria-pressed={form.avatar === avatar}
+                    onClick={() => setForm({ ...form, avatar })}
                     className={`grid size-11 place-items-center rounded-2xl text-xl transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
-                      form.avatar === a ? "bg-primary/20 ring-2 ring-primary" : "bg-muted"
+                      form.avatar === avatar ? "bg-primary/20 ring-2 ring-primary" : "bg-muted"
                     }`}
                   >
-                    {a}
+                    {avatar}
                   </button>
                 ))}
               </div>
@@ -241,26 +221,19 @@ function Profile() {
                 rows={3}
                 maxLength={160}
                 value={form.bio}
-                aria-invalid={!!errors['bio']}
+                aria-invalid={Boolean(errors["bio"])}
                 onChange={(e) => setForm({ ...form, bio: e.target.value })}
               />
               <p className="text-xs text-muted-foreground">{form.bio.length}/160</p>
-              {errors['bio'] && (
-                <p className="text-sm font-semibold text-destructive">{errors['bio']}</p>
-              )}
+              {errors["bio"] && <p className="text-sm font-semibold text-destructive">{errors["bio"]}</p>}
             </div>
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="ghost"
-                className="rounded-full font-bold"
-                onClick={() => setOpen(false)}
-              >
+              <Button type="button" variant="ghost" className="rounded-full font-bold" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={saving} className="rounded-full font-bold">
-                {saving ? "Saving…" : "Save changes"}
+                {saving ? "Saving..." : "Save changes"}
               </Button>
             </DialogFooter>
           </form>

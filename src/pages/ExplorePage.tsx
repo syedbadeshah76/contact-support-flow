@@ -1,62 +1,49 @@
 import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
-
-import { PageHeader } from "@/components/PageHeader";
 import { CourseCard } from "@/components/CourseCard";
+import { PageHeader } from "@/components/PageHeader";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { allCourses, subjects } from "@/data/portal";
-
-export const Route = createFileRoute("/explore")({
-  head: () => ({
-    meta: [
-      { title: "Explore Courses — Kidzy" },
-      {
-        name: "description",
-        content: "Search and filter hundreds of teen-friendly courses by subject, level and price.",
-      },
-      { property: "og:title", content: "Explore Courses — Kidzy" },
-      {
-        property: "og:description",
-        content: "Search and filter teen-friendly courses by subject, level and price.",
-      },
-    ],
-  }),
-  validateSearch: (
-    search: Record<string, unknown>,
-  ): { q?: string | undefined; subject?: string | undefined } => ({
-    q: typeof search['q'] === "string" ? search['q'].slice(0, 80) : undefined,
-    subject: typeof search['subject'] === "string" ? search['subject'] : undefined,
-  }),
-  component: Explore,
-});
+import { useDocumentMeta } from "@/lib/meta";
 
 const levels = ["All levels", "Beginner", "Intermediate", "Advanced"] as const;
 const prices = ["All", "Free", "Premium"] as const;
 
-function Explore() {
-  const { q = "", subject = "All" } = Route.useSearch();
-  const navigate = useNavigate({ from: "/explore" });
-  const query = q;
-  const setQuery = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, q: value.slice(0, 80) }) });
-  const setSubject = (value: string) =>
-    navigate({ search: (prev) => ({ ...prev, subject: value }) });
+export function ExplorePage() {
+  useDocumentMeta(
+    "Explore Courses - Kidzy",
+    "Search and filter hundreds of teen-friendly courses by subject, level and price.",
+  );
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q")?.slice(0, 80) ?? "";
+  const subject = searchParams.get("subject") ?? "All";
   const [level, setLevel] = useState<(typeof levels)[number]>("All levels");
   const [price, setPrice] = useState<(typeof prices)[number]>("All");
+
+  const setParams = (next: { q?: string; subject?: string }) => {
+    const params = new URLSearchParams(searchParams);
+    if (next.q !== undefined) params.set("q", next.q.slice(0, 80));
+    if (next.subject !== undefined) params.set("subject", next.subject);
+    navigate(`/explore?${params.toString()}`, { replace: true });
+  };
 
   const results = useMemo(
     () =>
       allCourses.filter(
-        (c) =>
-          (subject === "All" || c.subject === subject) &&
-          (level === "All levels" || c.level === level) &&
-          (price === "All" || c.price === price) &&
-          (c.title + c.teacher + c.subject).toLowerCase().includes(query.toLowerCase()),
+        (course) =>
+          (subject === "All" || course.subject === subject) &&
+          (level === "All levels" || course.level === level) &&
+          (price === "All" || course.price === price) &&
+          `${course.title}${course.teacher}${course.subject}`
+            .toLowerCase()
+            .includes(query.toLowerCase()),
       ),
-    [query, subject, level, price],
+    [level, price, query, subject],
   );
 
   return (
@@ -64,7 +51,7 @@ function Explore() {
       <PageHeader
         eyebrow="Discover"
         title="Explore courses"
-        description="Hundreds of courses built for ages 12-19 — filter until you find your thing."
+        description="Hundreds of courses built for ages 12-19 - filter until you find your thing."
       />
 
       <div className="card-surface space-y-4 p-5">
@@ -72,7 +59,7 @@ function Explore() {
           <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => setParams({ q: e.target.value })}
             placeholder="What do you want to learn today?"
             aria-label="Search courses"
             className="h-14 rounded-full pl-12 text-base"
@@ -80,28 +67,32 @@ function Explore() {
         </div>
 
         <FilterRow label="Subject">
-          <Chip active={subject === "All"} onClick={() => setSubject("All")}>
+          <Chip active={subject === "All"} onClick={() => setParams({ subject: "All" })}>
             All
           </Chip>
-          {subjects.map((s) => (
-            <Chip key={s.name} active={subject === s.name} onClick={() => setSubject(s.name)}>
-              {s.emoji} {s.name}
+          {subjects.map((item) => (
+            <Chip
+              key={item.name}
+              active={subject === item.name}
+              onClick={() => setParams({ subject: item.name })}
+            >
+              {item.emoji} {item.name}
             </Chip>
           ))}
         </FilterRow>
 
         <FilterRow label="Level">
-          {levels.map((l) => (
-            <Chip key={l} active={level === l} onClick={() => setLevel(l)}>
-              {l}
+          {levels.map((item) => (
+            <Chip key={item} active={level === item} onClick={() => setLevel(item)}>
+              {item}
             </Chip>
           ))}
         </FilterRow>
 
         <FilterRow label="Price">
-          {prices.map((p) => (
-            <Chip key={p} active={price === p} onClick={() => setPrice(p)}>
-              {p}
+          {prices.map((item) => (
+            <Chip key={item} active={price === item} onClick={() => setPrice(item)}>
+              {item}
             </Chip>
           ))}
         </FilterRow>
@@ -118,7 +109,7 @@ function Explore() {
             onClick={() => {
               setLevel("All levels");
               setPrice("All");
-              navigate({ search: { q: "", subject: "All" } });
+              navigate("/explore?q=&subject=All", { replace: true });
             }}
           >
             <X className="size-4" /> Clear filters
@@ -127,8 +118,8 @@ function Explore() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {results.map((c) => (
-          <CourseCard key={c.id} course={c} />
+        {results.map((course) => (
+          <CourseCard key={course.id} course={course} />
         ))}
       </div>
 
@@ -142,7 +133,7 @@ function Explore() {
             onClick={() => {
               setLevel("All levels");
               setPrice("All");
-              navigate({ search: { q: "", subject: "All" } });
+              navigate("/explore?q=&subject=All", { replace: true });
             }}
           >
             Reset all filters

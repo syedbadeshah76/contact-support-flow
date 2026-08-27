@@ -1,30 +1,18 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { learningPath } from "@/data/portal";
+import { useDocumentMeta } from "@/lib/meta";
 
-export const Route = createFileRoute("/learning-path")({
-  head: () => ({
-    meta: [
-      { title: "Learning Path — Kidzy" },
-      {
-        name: "description",
-        content: "A level-by-level roadmap from foundations to your final challenge and certificate.",
-      },
-      { property: "og:title", content: "Learning Path — Kidzy" },
-      {
-        property: "og:description",
-        content: "A level-by-level roadmap from foundations to certificate.",
-      },
-    ],
-  }),
-  component: LearningPath,
-});
+export function LearningPathPage() {
+  useDocumentMeta(
+    "Learning Path - Kidzy",
+    "A level-by-level roadmap from foundations to your final challenge and certificate.",
+  );
 
-function LearningPath() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-7">
       <PageHeader
@@ -34,10 +22,11 @@ function LearningPath() {
       />
 
       <ol className="relative space-y-4 border-l-2 border-dashed border-border pl-6">
-        {learningPath.map((step, i) => {
+        {learningPath.map((step, index) => {
           const done = step.progress === 100;
           const active = !done && step.progress > 0;
           const locked = !done && step.progress === 0;
+
           return (
             <li key={step.level} className="relative">
               <span
@@ -49,7 +38,7 @@ function LearningPath() {
                       : "bg-muted text-muted-foreground"
                 }`}
               >
-                {done ? "✓" : i + 1}
+                {done ? "✓" : index + 1}
               </span>
               <div className="card-surface p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -61,16 +50,12 @@ function LearningPath() {
                 <div className="mt-4 flex flex-wrap gap-2">
                   {active && (
                     <Button asChild className="rounded-full font-bold">
-                      <Link to="/courses/$courseId" params={{ courseId: "python-quest" }}>
-                        Continue level
-                      </Link>
+                      <Link to="/courses/python-quest">Continue level</Link>
                     </Button>
                   )}
                   {done && (
                     <Button asChild variant="outline" className="rounded-full font-bold">
-                      <Link to="/courses/$courseId" params={{ courseId: "python-quest" }}>
-                        Review level
-                      </Link>
+                      <Link to="/courses/python-quest">Review level</Link>
                     </Button>
                   )}
                   {locked && (
@@ -79,7 +64,7 @@ function LearningPath() {
                       className="rounded-full font-bold"
                       onClick={() =>
                         toast.message("Locked", {
-                          description: `Finish "${learningPath[i - 1]?.level}" to unlock this step.`,
+                          description: `Finish "${learningPath[index - 1]?.level}" to unlock this step.`,
                         })
                       }
                     >

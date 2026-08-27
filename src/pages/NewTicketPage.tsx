@@ -1,6 +1,6 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft, Paperclip } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -18,22 +18,10 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { supportTopics } from "@/data/support";
+import { useDocumentMeta } from "@/lib/meta";
 
-const title = "Raise a support ticket — Kidzy Learning Portal";
-const description =
-  "Tell us what went wrong and our support crew will reply within 24 hours.";
-
-export const Route = createFileRoute("/support/new")({
-  head: () => ({
-    meta: [
-      { title },
-      { name: "description", content: description },
-      { property: "og:title", content: title },
-      { property: "og:description", content: description },
-    ],
-  }),
-  component: NewTicket,
-});
+const title = "Raise a support ticket - Kidzy Learning Portal";
+const description = "Tell us what went wrong and our support crew will reply within 24 hours.";
 
 const ticketSchema = z.object({
   name: z.string().trim().min(1, "Please add your name").max(80),
@@ -50,7 +38,9 @@ const ticketSchema = z.object({
 
 type Errors = Partial<Record<keyof z.infer<typeof ticketSchema>, string>>;
 
-function NewTicket() {
+export function NewTicketPage() {
+  useDocumentMeta(title, description);
+
   const [form, setForm] = useState({
     name: "Emma Rivera",
     email: "emma@kidzy.app",
@@ -61,9 +51,9 @@ function NewTicket() {
   });
   const [errors, setErrors] = useState<Errors>({});
 
-  const set = (key: keyof typeof form, value: string) => {
-    setForm((f) => ({ ...f, [key]: value }));
-    setErrors((e) => ({ ...e, [key]: undefined }));
+  const setField = (key: keyof typeof form, value: string) => {
+    setForm((current) => ({ ...current, [key]: value }));
+    setErrors((current) => ({ ...current, [key]: undefined }));
   };
 
   const submit = (e: React.FormEvent) => {
@@ -78,11 +68,12 @@ function NewTicket() {
       toast.error("Please fix the highlighted fields");
       return;
     }
+
     setErrors({});
-    toast.success("Ticket submitted — reference KZ-2492", {
+    toast.success("Ticket submitted - reference KZ-2492", {
       description: "We'll email you the moment a helper replies.",
     });
-    setForm((f) => ({ ...f, subject: "", details: "" }));
+    setForm((current) => ({ ...current, subject: "", details: "" }));
   };
 
   return (
@@ -97,19 +88,14 @@ function NewTicket() {
       <PageHeader
         eyebrow="New request"
         title="Raise a support ticket"
-        description="Share as much detail as you can — screenshots and lesson names help us fix things faster."
+        description="Share as much detail as you can - screenshots and lesson names help us fix things faster."
       />
 
       <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
         <form onSubmit={submit} noValidate className="card-surface space-y-5 p-5 sm:p-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Your name" error={errors.name} htmlFor="name">
-              <Input
-                id="name"
-                value={form.name}
-                maxLength={80}
-                onChange={(e) => set("name", e.target.value)}
-              />
+              <Input id="name" value={form.name} maxLength={80} onChange={(e) => setField("name", e.target.value)} />
             </Field>
             <Field label="Email" error={errors.email} htmlFor="email">
               <Input
@@ -117,20 +103,20 @@ function NewTicket() {
                 type="email"
                 value={form.email}
                 maxLength={255}
-                onChange={(e) => set("email", e.target.value)}
+                onChange={(e) => setField("email", e.target.value)}
               />
             </Field>
           </div>
 
           <Field label="Topic" error={errors.topic} htmlFor="topic">
-            <Select value={form.topic} onValueChange={(v) => set("topic", v)}>
+            <Select value={form.topic} onValueChange={(value) => setField("topic", value)}>
               <SelectTrigger id="topic">
                 <SelectValue placeholder="What is this about?" />
               </SelectTrigger>
               <SelectContent>
-                {supportTopics.map((t) => (
-                  <SelectItem key={t.name} value={t.name}>
-                    {t.emoji} {t.name}
+                {supportTopics.map((topic) => (
+                  <SelectItem key={topic.name} value={topic.name}>
+                    {topic.emoji} {topic.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -140,23 +126,23 @@ function NewTicket() {
           <Field label="How urgent is it?" htmlFor="priority">
             <RadioGroup
               value={form.priority}
-              onValueChange={(v) => set("priority", v)}
+              onValueChange={(value) => setField("priority", value)}
               className="grid gap-3 sm:grid-cols-3"
             >
               {[
-                { v: "low", l: "Low", d: "Can wait a few days" },
-                { v: "medium", l: "Medium", d: "Blocking some learning" },
-                { v: "high", l: "High", d: "Can't use the app" },
-              ].map((o) => (
+                { value: "low", label: "Low", detail: "Can wait a few days" },
+                { value: "medium", label: "Medium", detail: "Blocking some learning" },
+                { value: "high", label: "High", detail: "Can't use the app" },
+              ].map((option) => (
                 <Label
-                  key={o.v}
-                  htmlFor={`p-${o.v}`}
+                  key={option.value}
+                  htmlFor={`p-${option.value}`}
                   className="flex cursor-pointer items-start gap-2 rounded-2xl border border-border bg-muted/50 p-3 has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary-soft"
                 >
-                  <RadioGroupItem id={`p-${o.v}`} value={o.v} className="mt-0.5" />
+                  <RadioGroupItem id={`p-${option.value}`} value={option.value} className="mt-0.5" />
                   <span>
-                    <span className="block text-sm font-bold">{o.l}</span>
-                    <span className="block text-xs text-muted-foreground">{o.d}</span>
+                    <span className="block text-sm font-bold">{option.label}</span>
+                    <span className="block text-xs text-muted-foreground">{option.detail}</span>
                   </span>
                 </Label>
               ))}
@@ -169,7 +155,7 @@ function NewTicket() {
               placeholder="Short summary of the problem"
               value={form.subject}
               maxLength={120}
-              onChange={(e) => set("subject", e.target.value)}
+              onChange={(e) => setField("subject", e.target.value)}
             />
           </Field>
 
@@ -180,11 +166,9 @@ function NewTicket() {
               placeholder="Tell us what you did, what you expected, and what happened instead."
               value={form.details}
               maxLength={1000}
-              onChange={(e) => set("details", e.target.value)}
+              onChange={(e) => setField("details", e.target.value)}
             />
-            <p className="mt-1 text-right text-xs text-muted-foreground">
-              {form.details.length}/1000
-            </p>
+            <p className="mt-1 text-right text-xs text-muted-foreground">{form.details.length}/1000</p>
           </Field>
 
           <div className="flex flex-wrap items-center gap-3">
