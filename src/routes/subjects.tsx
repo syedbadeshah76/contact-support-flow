@@ -35,7 +35,8 @@ function Subjects() {
           <Link
             key={s.name}
             to="/explore"
-            className={`card-surface flex items-center gap-4 p-6 transition-transform hover:-translate-y-1 ${s.tint}`}
+            search={{ subject: s.name, q: "" }}
+            className={`card-surface flex items-center gap-4 p-6 transition-transform hover:-translate-y-1 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${s.tint}`}
           >
             <span className="grid size-16 place-items-center rounded-2xl bg-card text-3xl shadow-card">
               {s.emoji}

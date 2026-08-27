@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { PageHeader } from "@/components/PageHeader";
 import { Progress } from "@/components/ui/progress";
@@ -36,6 +37,7 @@ function LearningPath() {
         {learningPath.map((step, i) => {
           const done = step.progress === 100;
           const active = !done && step.progress > 0;
+          const locked = !done && step.progress === 0;
           return (
             <li key={step.level} className="relative">
               <span
@@ -56,9 +58,35 @@ function LearningPath() {
                 </div>
                 <p className="text-sm text-muted-foreground">{step.detail}</p>
                 <Progress value={step.progress} className="mt-3 h-2" />
-                {active && (
-                  <Button className="mt-4 rounded-full font-bold">Continue level</Button>
-                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {active && (
+                    <Button asChild className="rounded-full font-bold">
+                      <Link to="/courses/$courseId" params={{ courseId: "python-quest" }}>
+                        Continue level
+                      </Link>
+                    </Button>
+                  )}
+                  {done && (
+                    <Button asChild variant="outline" className="rounded-full font-bold">
+                      <Link to="/courses/$courseId" params={{ courseId: "python-quest" }}>
+                        Review level
+                      </Link>
+                    </Button>
+                  )}
+                  {locked && (
+                    <Button
+                      variant="ghost"
+                      className="rounded-full font-bold"
+                      onClick={() =>
+                        toast.message("Locked", {
+                          description: `Finish "${learningPath[i - 1]?.level}" to unlock this step.`,
+                        })
+                      }
+                    >
+                      🔒 Locked
+                    </Button>
+                  )}
+                </div>
               </div>
             </li>
           );
