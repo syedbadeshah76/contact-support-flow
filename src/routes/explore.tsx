@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Search, X } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 
 import { PageHeader } from "@/components/PageHeader";
 import { CourseCard } from "@/components/CourseCard";
@@ -22,6 +24,10 @@ export const Route = createFileRoute("/explore")({
       },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" ? search.q.slice(0, 80) : "",
+    subject: typeof search.subject === "string" ? search.subject : "All",
+  }),
   component: Explore,
 });
 
@@ -29,8 +35,13 @@ const levels = ["All levels", "Beginner", "Intermediate", "Advanced"] as const;
 const prices = ["All", "Free", "Premium"] as const;
 
 function Explore() {
-  const [query, setQuery] = useState("");
-  const [subject, setSubject] = useState("All");
+  const { q, subject } = Route.useSearch();
+  const navigate = useNavigate({ from: "/explore" });
+  const query = q;
+  const setQuery = (value: string) =>
+    navigate({ search: (prev) => ({ ...prev, q: value.slice(0, 80) }) });
+  const setSubject = (value: string) =>
+    navigate({ search: (prev) => ({ ...prev, subject: value }) });
   const [level, setLevel] = useState<(typeof levels)[number]>("All levels");
   const [price, setPrice] = useState<(typeof prices)[number]>("All");
 
@@ -94,9 +105,24 @@ function Explore() {
         </FilterRow>
       </div>
 
-      <p className="text-sm font-semibold text-muted-foreground">
-        {results.length} course{results.length === 1 ? "" : "s"} found
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-muted-foreground">
+          {results.length} course{results.length === 1 ? "" : "s"} found
+        </p>
+        {(query || subject !== "All" || level !== "All levels" || price !== "All") && (
+          <Button
+            variant="ghost"
+            className="rounded-full font-bold"
+            onClick={() => {
+              setLevel("All levels");
+              setPrice("All");
+              navigate({ search: { q: "", subject: "All" } });
+            }}
+          >
+            <X className="size-4" /> Clear filters
+          </Button>
+        )}
+      </div>
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {results.map((c) => (
@@ -109,6 +135,16 @@ function Explore() {
           <p className="text-4xl">🔍</p>
           <p className="mt-2 font-bold">Nothing matched those filters</p>
           <p className="text-sm text-muted-foreground">Try clearing one of them.</p>
+          <Button
+            className="mt-4 rounded-full font-bold"
+            onClick={() => {
+              setLevel("All levels");
+              setPrice("All");
+              navigate({ search: { q: "", subject: "All" } });
+            }}
+          >
+            Reset all filters
+          </Button>
         </div>
       )}
     </div>
@@ -138,7 +174,8 @@ function Chip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+      aria-pressed={active}
+      className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors active:scale-95 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
         active
           ? "bg-primary text-primary-foreground"
           : "bg-muted text-muted-foreground hover:bg-primary-soft hover:text-accent-foreground"
