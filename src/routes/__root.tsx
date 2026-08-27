@@ -15,6 +15,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopBar } from "@/components/TopBar";
 import { Toaster } from "@/components/ui/sonner";
+import { AppStateProvider } from "@/lib/app-state";
 
 
 function NotFoundComponent() {
@@ -135,6 +136,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AppStateProvider>
       <SidebarProvider>
         <div className="flex min-h-screen w-full bg-background">
           <AppSidebar />
@@ -148,6 +150,7 @@ function RootComponent() {
         </div>
         <Toaster />
       </SidebarProvider>
+      </AppStateProvider>
     </QueryClientProvider>
   );
 }
