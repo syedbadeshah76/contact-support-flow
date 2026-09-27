@@ -1,4 +1,4 @@
-import { Bell, Search, Flame, Zap, Check, Trash2 } from "lucide-react";
+import { Bell, Search, Flame, Zap, Check, Trash2, Video, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,9 +18,9 @@ import { learner } from "@/data/portal";
 import { useAppState } from "@/lib/app-state";
 
 const initialNotifications = [
-  { id: "n1", emoji: "🔥", text: "17-day streak - keep it going!", to: "/achievements" as const },
-  { id: "n2", emoji: "🎥", text: "Fractions Face-Off starts in 2h", to: "/live-classes" as const },
-  { id: "n3", emoji: "🎫", text: "Riya replied to your support ticket", to: "/support/tickets" as const },
+  { id: "n1", icon: Flame, text: "17-day streak - keep it going!", to: "/achievements" as const },
+  { id: "n2", icon: Video, text: "Fractions Face-Off starts in 2h", to: "/live-classes" as const },
+  { id: "n3", icon: MessageCircle, text: "Riya replied to your support ticket", to: "/support/tickets" as const },
 ];
 
 export function TopBar() {
@@ -157,7 +157,7 @@ export function TopBar() {
                 }}
                 className="cursor-pointer gap-3 rounded-md px-3 py-3 focus:bg-accent"
               >
-                <span className="text-lg" aria-hidden="true">{n.emoji}</span>
+                <n.icon className="size-4 shrink-0 text-primary" aria-hidden="true" />
                 <span className={`min-w-0 flex-1 text-sm ${readNotifications.includes(n.id) ? "text-muted-foreground" : "font-semibold"}`}>
                   {n.text}
                 </span>
