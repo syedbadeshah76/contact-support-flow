@@ -1,4 +1,4 @@
-import { Bell, Search, Flame, Zap, Check } from "lucide-react";
+import { Bell, Search, Flame, Zap, Check, Trash2, Video, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,16 +18,24 @@ import { learner } from "@/data/portal";
 import { useAppState } from "@/lib/app-state";
 
 const initialNotifications = [
-  { id: "n1", emoji: "🔥", text: "17-day streak - keep it going!", to: "/achievements" as const },
-  { id: "n2", emoji: "🎥", text: "Fractions Face-Off starts in 2h", to: "/live-classes" as const },
-  { id: "n3", emoji: "🎫", text: "Riya replied to your support ticket", to: "/support/tickets" as const },
+  { id: "n1", icon: Flame, text: "17-day streak - keep it going!", to: "/achievements" as const },
+  { id: "n2", icon: Video, text: "Fractions Face-Off starts in 2h", to: "/live-classes" as const },
+  { id: "n3", icon: MessageCircle, text: "Riya replied to your support ticket", to: "/support/tickets" as const },
 ];
 
 export function TopBar() {
   const navigate = useNavigate();
-  const { profile } = useAppState();
+  const {
+    profile,
+    readNotifications,
+    dismissedNotifications,
+    markNotificationRead,
+    markAllNotificationsRead,
+    clearNotifications,
+  } = useAppState();
   const [query, setQuery] = useState("");
-  const [unread, setUnread] = useState(initialNotifications.map((n) => n.id));
+  const notifications = initialNotifications.filter((n) => !dismissedNotifications.includes(n.id));
+  const unread = notifications.filter((n) => !readNotifications.includes(n.id));
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,46 +91,77 @@ export function TopBar() {
         {/* Bell Notification Button */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button
-              className="relative grid size-9 place-items-center rounded-full bg-emerald-100 text-emerald-700 transition-transform hover:scale-105 focus-visible:outline-none"
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="relative grid size-9 place-items-center rounded-full bg-mint/15 text-mint-foreground transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={`Notifications (${unread.length} unread)`}
             >
-              <Bell className="size-4 text-emerald-700" />
+              <Bell className="size-4" />
               {unread.length > 0 && (
-                <span className="absolute right-1 top-1 size-2 rounded-full bg-red-500 ring-2 ring-white" />
+                <span className="absolute right-1 top-1 size-2 rounded-full bg-destructive ring-2 ring-popover" />
               )}
-            </button>
+            </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-72 rounded-2xl">
-            <DropdownMenuLabel className="flex items-center justify-between gap-2">
-              Notifications
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 rounded-full text-xs font-bold"
-                disabled={unread.length === 0}
-                onClick={() => {
-                  setUnread([]);
-                  toast.success("All notifications marked as read");
-                }}
-              >
-                <Check className="size-3" /> Mark all read
-              </Button>
+          <DropdownMenuContent align="end" sideOffset={8} className="w-[min(22rem,calc(100vw-1rem))] rounded-lg border-border bg-popover p-2 text-popover-foreground shadow-lg">
+            <DropdownMenuLabel className="flex items-center justify-between gap-2 px-2 py-2">
+              <span className="text-sm font-bold">Notifications{unread.length > 0 ? ` (${unread.length})` : ""}</span>
+              {notifications.length > 0 && (
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    title="Mark all as read"
+                    aria-label="Mark all as read"
+                    className="size-8 p-0"
+                    disabled={unread.length === 0}
+                    onClick={() => {
+                      markAllNotificationsRead(notifications.map((n) => n.id));
+                      toast.success("All notifications marked as read");
+                    }}
+                  >
+                    <Check className="size-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    title="Clear all notifications"
+                    aria-label="Clear all notifications"
+                    className="size-8 p-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => {
+                      clearNotifications(notifications.map((n) => n.id));
+                      toast.success("Notifications cleared");
+                    }}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              )}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {initialNotifications.map((n) => (
+            {notifications.length === 0 && (
+              <div className="flex flex-col items-center gap-2 px-4 py-8 text-center text-muted-foreground">
+                <Bell className="size-5" />
+                <p className="text-sm">You're all caught up</p>
+              </div>
+            )}
+            {notifications.map((n) => (
               <DropdownMenuItem
                 key={n.id}
                 onSelect={() => {
-                  setUnread((current) => current.filter((id) => id !== n.id));
+                  markNotificationRead(n.id);
                   navigate(n.to);
                 }}
-                className="cursor-pointer gap-2 rounded-xl"
+                className="cursor-pointer gap-3 rounded-md px-3 py-3 focus:bg-accent"
               >
-                <span>{n.emoji}</span>
-                <span className={unread.includes(n.id) ? "font-semibold" : "text-muted-foreground"}>
+                <n.icon className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                <span className={`min-w-0 flex-1 text-sm ${readNotifications.includes(n.id) ? "text-muted-foreground" : "font-semibold"}`}>
                   {n.text}
                 </span>
+                {!readNotifications.includes(n.id) && <span className="size-2 shrink-0 rounded-full bg-primary" aria-label="Unread" />}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>

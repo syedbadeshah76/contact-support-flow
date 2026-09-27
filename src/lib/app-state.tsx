@@ -20,6 +20,8 @@ type Persisted = {
   profile: { name: string; avatar: string; bio: string };
   quizScores: Record<string, number>;
   reminders: string[];
+  readNotifications: string[];
+  dismissedNotifications: string[];
 };
 
 const defaultState: Persisted = {
@@ -30,6 +32,8 @@ const defaultState: Persisted = {
   profile: { name: learner.name, avatar: learner.avatar, bio: "Level 12 explorer. Python & art." },
   quizScores: {},
   reminders: [],
+  readNotifications: [],
+  dismissedNotifications: [],
 };
 
 type AppStateValue = Persisted & {
@@ -43,6 +47,9 @@ type AppStateValue = Persisted & {
   saveProfile: (p: Persisted["profile"]) => void;
   setQuizScore: (title: string, score: number) => void;
   toggleReminder: (topic: string) => boolean;
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: (ids: string[]) => void;
+  clearNotifications: (ids: string[]) => void;
 };
 
 const AppStateContext = createContext<AppStateValue | null>(null);
@@ -110,6 +117,14 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         persist({ ...state, reminders: next });
         return next.includes(topic);
       },
+      markNotificationRead: (id) => {
+        if (state.readNotifications.includes(id)) return;
+        persist({ ...state, readNotifications: [...state.readNotifications, id] });
+      },
+      markAllNotificationsRead: (ids) =>
+        persist({ ...state, readNotifications: [...new Set([...state.readNotifications, ...ids])] }),
+      clearNotifications: (ids) =>
+        persist({ ...state, dismissedNotifications: [...new Set([...state.dismissedNotifications, ...ids])] }),
     };
   }, [state, persist]);
 

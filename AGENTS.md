@@ -48,7 +48,7 @@ Before starting any feature or fix, inspect:
 ---
 
 ## 5. State & Persistence Conventions
-- All persistent client state (enrolled courses, favorites, completed daily challenges, quiz scores, profile info) must be managed through `useAppState()` in `src/lib/app-state.tsx`.
+- Keep persistent state, including notifications, in `useAppState()` so it survives navigation and refresh.
 - LocalStorage updates must be handled via `persist()` inside `AppStateProvider` using `kidzy-app-state-v1`.
 
 ---
