@@ -1,3 +1,13 @@
+# Playful Neo-Pop quiz
+
+- Active quizzes now open as a bold, spacious challenge screen with a mascot, XP and streak cues, progress, and a 30-second timer.
+- Four responsive answer tiles provide immediate correct and incorrect feedback before advancing.
+- Timed-out questions advance safely, while scoring, saved best scores, retry, and completion controls remain intact.
+
+## Verification
+
+- Pending final preview, responsive interaction, and type checks.
+
 # Notification popover
 
 - The header bell opens a notification list with an unread count.
