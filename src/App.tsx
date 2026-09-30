@@ -10,6 +10,7 @@ import { CertificatesPage } from "@/pages/CertificatesPage";
 import { CourseDetailPage } from "@/pages/CourseDetailPage";
 import { DashboardPage } from "@/pages/DashboardPage";
 import { ExplorePage } from "@/pages/ExplorePage";
+import { EditProfilePage } from "@/pages/EditProfilePage";
 import { LeaderboardPage } from "@/pages/LeaderboardPage";
 import { LearningPathPage } from "@/pages/LearningPathPage";
 import { LiveClassesPage } from "@/pages/LiveClassesPage";
@@ -74,6 +75,7 @@ export default function App() {
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/certificates" element={<CertificatesPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/edit" element={<EditProfilePage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/courses/:courseId" element={<CourseDetailPage />} />
           <Route path="/support" element={<SupportLayout />}>

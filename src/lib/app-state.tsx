@@ -77,7 +77,14 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setState((s) => ({ ...s, ...(JSON.parse(raw) as Partial<Persisted>) }));
+      if (raw) {
+        const stored = JSON.parse(raw) as Partial<Persisted>;
+        setState((s) => ({
+          ...s,
+          ...stored,
+          profile: { ...s.profile, ...stored.profile },
+        }));
+      }
     } catch {
       /* ignore corrupt storage */
     }

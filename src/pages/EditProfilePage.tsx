@@ -50,7 +50,11 @@ export function EditProfilePage() {
   const [age, setAge] = useState(String(profile.age ?? 14));
   const [email, setEmail] = useState(profile.email ?? "");
   const [avatar, setAvatar] = useState(profile.avatar);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(interests);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(() => {
+    const available = new Set(learningInterests.map((item) => item.name));
+    const saved = interests.filter((item) => available.has(item));
+    return saved.length > 0 ? saved : ["Solving puzzles", "Making art"];
+  });
   const [preferredSubjects, setPreferredSubjects] = useState<string[]>(profile.preferredSubjects ?? []);
   const [securityAlerts, setSecurityAlerts] = useState(profile.securityAlerts ?? true);
   const [currentPassword, setCurrentPassword] = useState("");
