@@ -1,17 +1,6 @@
-import { useState } from "react";
-import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAppState } from "@/lib/app-state";
 import { useDocumentMeta } from "@/lib/meta";
 
@@ -22,13 +11,14 @@ const profileStats = [
   { value: "62h", label: "Learning hours" },
 ];
 
-const interestsList = [
-  { name: "Math", icon: "➗" },
-  { name: "Science", icon: "🧪" },
-  { name: "English", icon: "📖" },
-  { name: "Coding", icon: "💻" },
-  { name: "Music", icon: "🎵" },
-];
+const interestIcons: Record<string, string> = {
+  "Building things": "🛠️",
+  "Solving puzzles": "🧩",
+  "Creative stories": "✍️",
+  "Making art": "🎨",
+  "Discovering nature": "🌱",
+  "Music & rhythm": "🎵",
+};
 
 const recentBadges = [
   { name: "Start Streak", icon: "🔥" },
@@ -48,15 +38,7 @@ export function ProfilePage() {
     "Your EDVANZ profile: level, XP, interests, badges and certificates.",
   );
 
-  const { profile, saveProfile } = useAppState();
-  const [open, setOpen] = useState(false);
-  const [nameInput, setNameInput] = useState(profile.name);
-
-  const handleSave = () => {
-    saveProfile({ ...profile, name: nameInput });
-    setOpen(false);
-    toast.success("Profile updated!");
-  };
+  const { profile, interests } = useAppState();
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 pb-12">
@@ -91,10 +73,10 @@ export function ProfilePage() {
         </div>
 
         <Button
-          onClick={() => setOpen(true)}
+          asChild
           className="rounded-full bg-white px-6 py-5 text-xs font-bold text-blue-600 shadow-sm hover:bg-slate-50 border-none active:scale-95"
         >
-          Edit Profile
+          <Link to="/profile/edit">Edit Profile</Link>
         </Button>
       </section>
 
@@ -115,13 +97,13 @@ export function ProfilePage() {
       <section className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
         <h3 className="text-lg font-black text-slate-900">Interests</h3>
         <div className="mt-4 flex flex-wrap gap-3">
-          {interestsList.map((interest) => (
+          {interests.map((interest) => (
             <span
-              key={interest.name}
+              key={interest}
               className="flex items-center gap-1.5 rounded-full bg-slate-100 px-4 py-2 text-xs font-extrabold text-slate-700 shadow-2xs"
             >
-              <span>{interest.icon}</span>
-              <span>{interest.name}</span>
+              <span>{interestIcons[interest] ?? "✨"}</span>
+              <span>{interest}</span>
             </span>
           ))}
         </div>
@@ -161,36 +143,6 @@ export function ProfilePage() {
         </section>
       </div>
 
-      {/* Edit Profile Dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="rounded-3xl sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-black">Edit Profile</DialogTitle>
-            <DialogDescription className="font-semibold text-slate-500">
-              Update your display name.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="font-bold">Display Name</Label>
-              <Input
-                id="name"
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
-                className="rounded-full"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)} className="rounded-full font-bold">
-              Cancel
-            </Button>
-            <Button onClick={handleSave} className="rounded-full bg-blue-600 font-bold text-white hover:bg-blue-700">
-              Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
