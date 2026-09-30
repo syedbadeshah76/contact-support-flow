@@ -17,7 +17,15 @@ type Persisted = {
   enrolled: string[];
   doneChallenges: string[];
   interests: string[];
-  profile: { name: string; avatar: string; bio: string };
+  profile: {
+    name: string;
+    avatar: string;
+    bio: string;
+    age: number;
+    email: string;
+    preferredSubjects: string[];
+    securityAlerts: boolean;
+  };
   quizScores: Record<string, number>;
   reminders: string[];
   readNotifications: string[];
@@ -29,7 +37,15 @@ const defaultState: Persisted = {
   enrolled: ["python-quest", "algebra-arcade", "story-lab"],
   doneChallenges: dailyChallenges.filter((c) => c.done).map((c) => c.task),
   interests: subjects.slice(0, 6).map((s) => s.name),
-  profile: { name: learner.name, avatar: learner.avatar, bio: "Level 12 explorer. Python & art." },
+  profile: {
+    name: learner.name,
+    avatar: learner.avatar,
+    bio: "Level 12 explorer. Python & art.",
+    age: 14,
+    email: "emma.watson@example.com",
+    preferredSubjects: ["Math", "Coding", "Art"],
+    securityAlerts: true,
+  },
   quizScores: {},
   reminders: [],
   readNotifications: [],
@@ -45,6 +61,7 @@ type AppStateValue = Persisted & {
   isChallengeDone: (task: string) => boolean;
   toggleInterest: (name: string) => boolean;
   saveProfile: (p: Persisted["profile"]) => void;
+  saveProfilePreferences: (p: Persisted["profile"], interests: string[]) => void;
   setQuizScore: (title: string, score: number) => void;
   toggleReminder: (topic: string) => boolean;
   markNotificationRead: (id: string) => void;
@@ -104,6 +121,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         return next.includes(name);
       },
       saveProfile: (profile) => persist({ ...state, profile }),
+      saveProfilePreferences: (profile, interests) => persist({ ...state, profile, interests }),
       setQuizScore: (title, score) =>
         persist({
           ...state,
