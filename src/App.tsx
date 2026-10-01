@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 
 import { AppSidebar } from "@/components/AppSidebar";
+import { PandaChatbot } from "@/components/PandaChatbot";
 import { TopBar } from "@/components/TopBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
@@ -39,6 +40,7 @@ function AppShell() {
             </main>
           </div>
         </div>
+        <PandaChatbot />
         <Toaster />
       </SidebarProvider>
     </AppStateProvider>

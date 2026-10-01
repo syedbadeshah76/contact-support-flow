@@ -29,3 +29,13 @@
 ## Verification
 
 - Pending final type, preview, persistence, validation, and responsive browser checks.
+
+# Floating Panda AI assistant
+
+- Pippin now floats at the bottom-right of every portal screen with a custom transparent 3D panda, gentle bounce, glow, and hover feedback.
+- Selecting Pippin opens a compact learning chat with quick actions, streamed answers, loading and error states, and a clear-chat control.
+- One conversation is saved in this browser and restored after navigation or refresh.
+
+## Verification
+
+- Pending final type, preview, chat, persistence, and responsive browser checks.
