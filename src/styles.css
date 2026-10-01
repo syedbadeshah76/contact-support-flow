@@ -224,6 +224,15 @@
   100% { transform: scale(1) rotate(0); opacity: 1; }
 }
 
+@keyframes panda-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-7px) rotate(1deg); }
+}
+
+@utility panda-float {
+  animation: panda-float 3.2s ease-in-out infinite;
+}
+
 @utility quiz-card-shadow {
   box-shadow: 10px 10px 0 var(--quiz-ink);
 }
@@ -242,7 +251,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-quiz-mascot,
-  .animate-quiz-celebrate {
+  .animate-quiz-celebrate,
+  .panda-float {
     animation: none;
   }
 }
