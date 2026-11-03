@@ -166,10 +166,82 @@ the same way as badge rewards.
 
 ---
 
+## 3.5 Level calculation & multiple course purchases
+
+### The rule in one sentence
+**Purchasing a course never adds XP or levels by itself.** XP (and therefore level) comes only
+from *doing*: finishing lessons, passing quizzes, joining live classes, completing courses.
+A student who buys 5 courses has the same XP as a student who bought 1 — until they start
+learning in them.
+
+### Why one global level, not one per course
+There is exactly **one XP balance and one level per student** (derived from `xp_events`).
+Multiple courses do not create multiple levels, multipliers, or parallel progress bars — they
+only add *more sources* of XP events feeding the same balance.
+
+```
+xp_total = SUM(xp_events.amount)                  -- global, course-agnostic
+level    = MAX(levels.level) WHERE xp_required <= xp_total
+```
+
+### Worked example — 2 courses, ladder from §2
+Ladder (cumulative): L2=200, L3=450, L4=750, L5=1100, L6=1500 …
+
+**Course A — "Python Basics" (purchased first)**
+| Action | XP event |
+|---|---|
+| Enroll (optional bonus, see below) | `course_enrolled` +50 |
+| 3 lessons complete (25 each) | `lesson_complete` +75 |
+| 2 quizzes passed (50 base + score/2 bonus) | `quiz_complete` +115 |
+| Course completed → certificate | `course_complete` +100 |
+| **Subtotal** | **340** |
+
+**Course B — "Math Challenges" (purchased later)**
+| Action | XP event |
+|---|---|
+| Enroll bonus | `course_enrolled` +50 |
+| 1 lesson complete | `lesson_complete` +25 |
+| **Subtotal** | **75** |
+
+**Total XP = 340 + 75 = 415 → Level 3** (450 needed for L4, so `xpToNext = 35`).
+Totals from both courses are simply added together; there is no per-course level and
+no stacking bonus for owning two courses.
+
+### Optional enrollment bonus (recommended: +50, once per course)
+If you want a purchase to feel rewarding, grant a one-time `course_enrolled` event of 50 XP.
+Enforce "once per course" in the database so refunds/re-purchases can't farm it:
+
+```sql
+create unique index xp_events_once_per_course
+  on public.xp_events (user_id, source, source_id)
+  where source = 'course_enrolled';
+```
+
+Even with this bonus, purchase XP is tiny (50) compared to learning XP (a full course is
+typically 400–900 XP), so it cannot be exploited and levels still reflect effort.
+
+### Backend flow (order matters)
+1. `POST /xp-events {source: 'course_enrolled', source_id: courseId, amount: 50}` on payment
+   success — guarded by the unique index above.
+2. Every learning action appends its event (§4 sources), each deduped by
+   `(user_id, source, source_id)` where source_id exists (a lesson can't pay twice).
+3. Recompute `xp_total = SUM(amount)`; look up `level` on the `levels` ladder.
+4. If `level` increased → level-up notification. Badges are evaluated the same as §3.
+
+### Common questions
+- **"What if a student buys 3 courses at once?"** Three `course_enrolled` events (+150 total,
+  one per course id). Levels still only move through the one ladder.
+- **"Does switching courses reset level?"** Never. XP is permanent and global.
+- **"Refunded course?"** Delete/mark-void the `course_enrolled` event for that course
+  (learning XP earned there is kept — it was real activity); re-run the level computation.
+
+---
+
 ## 4. XP sources & default amounts
 
 | source | amount | notes |
 |---|---|---|
+| `course_enrolled` | 50 | one-time per course, on payment success (§3.5) |
 | `lesson_complete` | 25 | per lesson |
 | `quiz_complete` | 50 base | + `score % / 2` bonus (e.g. 92% → +46) |
 | `daily_challenge` | varies | from the challenge definition (30–60) |
