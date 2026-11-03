@@ -241,6 +241,7 @@ typically 400–900 XP), so it cannot be exploited and levels still reflect effo
 
 | source | amount | notes |
 |---|---|---|
+| `course_enrolled` | 50 | one-time per course, on payment success (§3.5) |
 | `lesson_complete` | 25 | per lesson |
 | `quiz_complete` | 50 base | + `score % / 2` bonus (e.g. 92% → +46) |
 | `daily_challenge` | varies | from the challenge definition (30–60) |
