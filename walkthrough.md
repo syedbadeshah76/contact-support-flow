@@ -1,3 +1,10 @@
+# Simplified Achievements screen
+
+- One level card with total XP, progress bar, streak, coins and badge count.
+- A single badge grid: earned badges are colorful with an UNLOCKED chip, locked ones are grey with a simple progress bar and description.
+- Removed filters, badge detail popups and the XP activity feed — the logic to explain to the backend is unchanged (XP → level ladder, stat → badge goal).
+- Verified on desktop and mobile: renders without console errors; `bunx tsgo --noEmit` clean.
+
 # Playful Neo-Pop quiz
 
 - Active quizzes now open as a bold, spacious challenge screen with a mascot, XP and streak cues, progress, and a 30-second timer.
