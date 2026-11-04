@@ -3,8 +3,11 @@ import { useMemo } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Progress } from "@/components/ui/progress";
 import { BADGES } from "@/data/achievements";
-import { learner } from "@/data/portal";
-import { computeBadgeProgress, deriveStats, levelProgress } from "@/lib/achievements";
+import {
+  computeBadgeProgress,
+  deriveStats,
+  type LearnerStats,
+} from "@/lib/achievements";
 import { useAppState } from "@/lib/app-state";
 import { useDocumentMeta } from "@/lib/meta";
 import type { BadgeDef } from "@/data/achievements";
@@ -15,10 +18,46 @@ const tierStyles: Record<BadgeDef["tier"], string> = {
   Bronze: "bg-orange-100 text-orange-700",
 };
 
+/** The five numbers a learner controls. Each one feeds the badge goals below. */
+function statTiles(stats: LearnerStats) {
+  return [
+    {
+      emoji: "⚡",
+      label: "Lifetime XP",
+      value: stats.xpTotal.toLocaleString(),
+      hint: "Earned from lessons, quizzes and classes",
+    },
+    {
+      emoji: "🔥",
+      label: "Day streak",
+      value: stats.streakDays.toLocaleString(),
+      hint: "Learn something every day to grow it",
+    },
+    {
+      emoji: "🧠",
+      label: "Quizzes passed",
+      value: stats.quizzesPassed.toLocaleString(),
+      hint: "Score 80% or higher to pass",
+    },
+    {
+      emoji: "🧪",
+      label: "Live classes",
+      value: stats.liveClassesAttended.toLocaleString(),
+      hint: "Show up and learn together",
+    },
+    {
+      emoji: "🎨",
+      label: "Subjects explored",
+      value: stats.subjectsExplored.toLocaleString(),
+      hint: "Courses you're studying right now",
+    },
+  ];
+}
+
 export function AchievementsPage() {
   useDocumentMeta(
     "Achievements - EDVANZ",
-    "Badges, XP levels and milestones you've unlocked on your learning journey.",
+    "Badges and milestones you've unlocked on your learning journey.",
   );
 
   const { quizScores, enrolled } = useAppState();
@@ -27,65 +66,53 @@ export function AchievementsPage() {
     () => deriveStats({ quizScores, enrolledCourseIds: enrolled }),
     [quizScores, enrolled],
   );
-  const level = levelProgress(learner.xp);
   const entries = useMemo(
     () => BADGES.map((badge) => ({ badge, status: computeBadgeProgress(badge, stats) })),
     [stats],
   );
   const unlockedCount = entries.filter((entry) => entry.status.earned).length;
+  const tiles = statTiles(stats);
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-7">
       <PageHeader
         eyebrow="Flex zone"
         title="Achievements"
-        description="Keep learning to earn XP and unlock every badge."
+        description="Every badge watches one of your numbers — reach the goal and it unlocks automatically."
       />
 
-      {/* Level hero — one card, one number, one progress bar */}
+      {/* Your numbers — the stats that drive every badge */}
       <section className="rounded-3xl border border-[#ddd6fe] bg-gradient-to-r from-[#c7d2fe]/90 via-[#ede9fe] to-[#e0e7ff] p-6 shadow-sm sm:p-8">
-        <div className="flex flex-wrap items-center gap-6">
-          <div className="flex size-20 shrink-0 flex-col items-center justify-center rounded-3xl bg-white text-center shadow-md">
-            <span className="text-3xl font-black text-slate-900">{level.level}</span>
-            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">
-              Level
-            </span>
-          </div>
-          <div className="min-w-[220px] flex-1">
-            <p className="text-xs font-black uppercase tracking-wider text-blue-600">
-              {level.xpTotal.toLocaleString()} XP total
-            </p>
-            <div className="mt-2 w-full">
-              <div className="h-2.5 w-full overflow-hidden rounded-full bg-white/60">
-                <div
-                  className="h-full rounded-full bg-blue-600 transition-all"
-                  style={{ width: `${Math.max(4, level.percent)}%` }}
-                />
-              </div>
-              <p className="mt-1.5 text-[11px] font-bold text-slate-700">
-                {level.xpToNext.toLocaleString()} XP to Level {level.level + 1}
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="text-lg font-black text-slate-900">Your numbers</h3>
+          <span className="rounded-full bg-white px-4 py-2 text-xs font-extrabold text-slate-700 shadow-xs">
+            🏅 {unlockedCount}/{BADGES.length} badges
+          </span>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {tiles.map((tile) => (
+            <div
+              key={tile.label}
+              className="rounded-2xl bg-white/90 p-4 shadow-xs"
+            >
+              <span className="text-xl">{tile.emoji}</span>
+              <p className="mt-1 text-2xl font-black text-slate-900">{tile.value}</p>
+              <p className="text-[11px] font-black uppercase tracking-wide text-blue-600">
+                {tile.label}
+              </p>
+              <p className="mt-1 text-[10px] font-semibold leading-snug text-muted-foreground">
+                {tile.hint}
               </p>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-extrabold text-slate-700 shadow-xs">
-              🔥 {learner.streak}-day streak
-            </span>
-            <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-extrabold text-slate-700 shadow-xs">
-              🪙 {learner.coins.toLocaleString()} coins
-            </span>
-            <span className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-extrabold text-slate-700 shadow-xs">
-              🏅 {unlockedCount}/{BADGES.length} badges
-            </span>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Badges — every badge is a card. Earned badges are colorful, locked ones grey. */}
+      {/* Badges — each badge is one stat with a goal */}
       <section>
         <h3 className="text-lg font-black text-slate-900">Badges</h3>
         <p className="mt-0.5 text-sm font-semibold text-muted-foreground">
-          A badge unlocks automatically the moment you reach its goal.
+          A badge unlocks the moment its number reaches the goal.
         </p>
         <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {entries.map(({ badge, status }) => (

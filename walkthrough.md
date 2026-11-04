@@ -1,7 +1,7 @@
 # Simplified Achievements screen
 
-- One level card with total XP, progress bar, streak, coins and badge count.
-- A single badge grid: earned badges are colorful with an UNLOCKED chip, locked ones are grey with a simple progress bar and description.
+- A "Your numbers" strip: lifetime XP, day streak, quizzes passed, live classes and subjects explored — the five stats that drive every badge goal.
+- No level display. Each badge is one stat with a goal; earned badges are colorful with an UNLOCKED chip, locked ones are grey with a simple progress bar.
 - Removed filters, badge detail popups and the XP activity feed — the logic to explain to the backend is unchanged (XP → level ladder, stat → badge goal).
 - Verified on desktop and mobile: renders without console errors; `bunx tsgo --noEmit` clean.
 
