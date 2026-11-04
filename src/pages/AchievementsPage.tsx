@@ -3,8 +3,11 @@ import { useMemo } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { Progress } from "@/components/ui/progress";
 import { BADGES } from "@/data/achievements";
-import { learner } from "@/data/portal";
-import { computeBadgeProgress, deriveStats, levelProgress } from "@/lib/achievements";
+import {
+  computeBadgeProgress,
+  deriveStats,
+  type LearnerStats,
+} from "@/lib/achievements";
 import { useAppState } from "@/lib/app-state";
 import { useDocumentMeta } from "@/lib/meta";
 import type { BadgeDef } from "@/data/achievements";
